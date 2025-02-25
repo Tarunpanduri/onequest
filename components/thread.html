@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A modern, responsive webpage with beautiful thread animations.">
+  <title>Thread Animation Webpage</title>
+  <style>
+    /* General Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      background: #f4f4f9;
+      color: #333;
+      overflow-x: hidden;
+    }
+
+    header {
+      background: #6200ea;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-around;
+      background: #3700b3;
+      color: white;
+      padding: 1rem;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      transition: color 0.3s;
+    }
+
+    nav a:hover {
+      color: #bb86fc;
+    }
+
+    section {
+      padding: 2rem;
+      position: relative;
+    }
+
+    h1, h2, h3 {
+      text-align: center;
+      margin-bottom: 1rem;
+      position: relative;
+      font-family: 'Gladolia DEMO', cursive;
+    }
+
+    h1::before, h1::after, h2::before, h2::after {
+      content: '';
+      position: absolute;
+      height: 3px;
+      background: #6200ea;
+      animation: thread-move 3s ease-in-out infinite;
+    }
+
+    h1::before {
+      width: 100%;
+      top: 0;
+      left: -100%;
+    }
+
+    h1::after {
+      width: 100%;
+      bottom: 0;
+      right: -100%;
+    }
+
+    h2::before {
+      width: 50%;
+      top: 0;
+      left: -100%;
+    }
+
+    h2::after {
+      width: 50%;
+      bottom: 0;
+      right: -100%;
+    }
+
+    @keyframes thread-move {
+      0%, 100% {
+        transform: translateX(0);
+      }
+      50% {
+        transform: translateX(100%);
+      }
+    }
+
+    /* Thread Around Images */
+    .image-container {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 2rem;
+      gap: 1rem;
+      position: relative;
+    }
+
+    .image-container img {
+      width: 200px;
+      height: 200px;
+      border-radius: 10px;
+      object-fit: cover;
+      border: 2px solid #6200ea;
+      position: relative;
+      z-index: 2;
+    }
+
+    .image-container img::before, .image-container img::after {
+      content: '';
+      position: absolute;
+      width: 2px;
+      height: 0;
+      background: #6200ea;
+      z-index: 1;
+      animation: draw-thread 5s linear infinite;
+    }
+
+    @keyframes draw-thread {
+      0% {
+        width: 0;
+        height: 0;
+      }
+      25% {
+        width: 100%;
+        height: 0;
+      }
+      50% {
+        width: 100%;
+        height: 100%;
+      }
+      75% {
+        width: 0;
+        height: 100%;
+      }
+      100% {
+        width: 0;
+        height: 0;
+      }
+    }
+
+    footer {
+      text-align: center;
+      background: #3700b3;
+      color: white;
+      padding: 1rem;
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Thread Animation Webpage</h1>
+  </header>
+
+  <nav>
+    <a href="#hero">Home</a>
+    <a href="#features">Features</a>
+    <a href="#gallery">Gallery</a>
+    <a href="#contact">Contact</a>
+  </nav>
+
+  <section id="hero">
+    <h2>Welcome to the World of Animations</h2>
+    <p style="text-align: center;">Beautiful animations that move like a thread weaving through your design.</p>
+  </section>
+
+  <section id="features">
+    <h2>Features</h2>
+    <ul style="list-style: none; padding: 0; text-align: center;">
+      <li>Responsive Design</li>
+      <li>Interactive Animations</li>
+      <li>Modern Aesthetics</li>
+    </ul>
+  </section>
+
+  <section id="gallery" class="image-container">
+    <h2>Gallery</h2>
+    <div>
+      <img src="https://via.placeholder.com/200" alt="Gallery Image 1">
+    </div>
+    <div>
+      <img src="https://via.placeholder.com/200" alt="Gallery Image 2">
+    </div>
+    <div>
+      <img src="https://via.placeholder.com/200" alt="Gallery Image 3">
+    </div>
+  </section>
+
+  <footer>
+    <p>Made with 💜 by You</p>
+  </footer>
+
+</body>
+</html>

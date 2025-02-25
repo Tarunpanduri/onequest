@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Notification Panel</title>
+</head>
+<body>
+    <h2>Send Notification</h2>
+    <textarea id="message" placeholder="Enter notification message"></textarea>
+    <button onclick="sendNotification()">Send</button>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAy_Lf6WnljttOxnjsdnHeJlk-hZsEKQJU",
+            authDomain: "onequestt.firebaseapp.com",
+            databaseURL: "https://onequestt-default-rtdb.firebaseio.com/",
+            projectId: "onequestt",
+            storageBucket: "onequestt.appspot.com",
+            messagingSenderId: "549898333490",
+            appId: "1:549898333490:web:a22f4b6e94176b11f33b2b",
+            measurementId: "G-YSTMPQZEEE"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function sendNotification() {
+            const message = document.getElementById("message").value;
+
+            if (!message) {
+                alert("Enter a message!");
+                return;
+            }
+
+            const usersRef = collection(db, "users");
+            const snapshot = await getDocs(usersRef);
+            
+            let tokens = [];
+            snapshot.forEach((doc) => {
+                const userData = doc.data();
+                if (userData.expoPushToken) {
+                    tokens.push(userData.expoPushToken);
+                }
+            });
+
+            if (tokens.length === 0) {
+                alert("No users with push tokens found!");
+                return;
+            }
+
+            // Send notification request to Expo
+            fetch("https://exp.host/--/api/v2/push/send", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                },
+                body: JSON.stringify(
+                    tokens.map(token => ({
+                        to: token,
+                        sound: "default",
+                        title: "New Notification",
+                        body: message,
+                    }))
+                ),
+            }).then(response => response.json())
+              .then(data => console.log(data))
+              .catch(error => console.error("Error:", error));
+
+            alert("Notification Sent!");
+        }
+    </script>
+</body>
+</html>

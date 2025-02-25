@@ -1,0 +1,265 @@
+{
+  "SavedUsers": {
+    "BEg8jVxkQBObHdyaC67iLO76Fxb2": {
+      "SavedAddress": {
+        "UserName": "Vdhdhs",
+        "WorkType": "Home",
+        "address": "4th Floor, Space No 406 VV Vintage Boulevard, Raj Bhavan Rd, Somajiguda, Hyderabad, Telangana 500082, India",
+        "area": "Somajiguda",
+        "city": "Hyderabad",
+        "contactNumber": "66564",
+        "id": "1738239488983",
+        "latitude": 17.426611,
+        "longitude": 78.4575024,
+        "name": "4th Floor",
+        "userId": "BEg8jVxkQBObHdyaC67iLO76Fxb2"
+      }
+    },
+    "jb1GOKjlZdaVG3uUftJIKcUh9j62": {
+      "SavedAddress": {
+        "UserName": "Tarun panduri",
+        "WorkType": "Home",
+        "address": "X678+CRG, Indra Palem, Kakinada, Andhra Pradesh 533006, India",
+        "area": "Indra Palem",
+        "city": "Kakinada",
+        "contactNumber": "9014031909",
+        "id": "1738215016149",
+        "latitude": 16.96337393518291,
+        "longitude": 82.21710350364447,
+        "name": "X678+CRG",
+        "userId": "jb1GOKjlZdaVG3uUftJIKcUh9j62"
+      }
+    },
+    "x099INlwzwTEeuLqtrzorthINLt2": {
+      "SavedAddress": {
+        "UserName": "Fzgsgg",
+        "WorkType": "Others",
+        "address": "70-3-30/1, RTC Colony, Ramanayapeta, Kakinada, Andhra Pradesh 533005, India",
+        "area": "Ramanayapeta",
+        "city": "Kakinada",
+        "contactNumber": "575757",
+        "id": "1738574600434",
+        "latitude": 16.99215065866051,
+        "longitude": 82.24811285734177,
+        "name": "70-3-30/1",
+        "userId": "x099INlwzwTEeuLqtrzorthINLt2"
+      }
+    }
+  },
+  "users": {
+    "BEg8jVxkQBObHdyaC67iLO76Fxb2": {
+      "addresses": {
+        "1738239488983": {
+          "UserName": "Vdhdhs",
+          "WorkType": "Home",
+          "address": "4th Floor, Space No 406 VV Vintage Boulevard, Raj Bhavan Rd, Somajiguda, Hyderabad, Telangana 500082, India",
+          "area": "Somajiguda",
+          "city": "Hyderabad",
+          "contactNumber": "66564",
+          "latitude": 17.426611,
+          "longitude": 78.4575024,
+          "name": "4th Floor",
+          "userId": "BEg8jVxkQBObHdyaC67iLO76Fxb2"
+        },
+        "1738239658785": {
+          "UserName": "Urkatu",
+          "WorkType": "Work",
+          "address": "1712 Steiner St, San Francisco, CA 94115, USA",
+          "area": "Lower Pacific Heights",
+          "city": "San Francisco",
+          "contactNumber": "56659",
+          "latitude": 37.78526133066993,
+          "longitude": -122.43440195918083,
+          "name": "1712 Steiner St",
+          "userId": "BEg8jVxkQBObHdyaC67iLO76Fxb2"
+        },
+        "1738242283943": {
+          "UserName": "Tarun panduri ",
+          "WorkType": "Work",
+          "address": "Flat no, VV Vintage Boulevard, 101/A, Somajiguda, Hyderabad, Telangana 500082, India",
+          "area": "Somajiguda",
+          "city": "Hyderabad",
+          "contactNumber": "9014031909",
+          "latitude": 17.4265519,
+          "longitude": 78.4575145,
+          "name": "CLIM IT SOLUTIONS",
+          "userId": "BEg8jVxkQBObHdyaC67iLO76Fxb2"
+        },
+        "1738302030985": {
+          "UserName": "Gshshs",
+          "WorkType": "Home",
+          "address": "Gadarada, Andhra Pradesh 533289, India",
+          "area": "Gadarada",
+          "city": "Gadarada",
+          "contactNumber": "5454545",
+          "latitude": 17.1595854,
+          "longitude": 81.8852582,
+          "name": "Gadarada",
+          "userId": "BEg8jVxkQBObHdyaC67iLO76Fxb2"
+        }
+      }
+    },
+    "jb1GOKjlZdaVG3uUftJIKcUh9j62": {
+      "addresses": {
+        "1738215016149": {
+          "UserName": "Tarun panduri",
+          "WorkType": "Home",
+          "address": "X678+CRG, Indra Palem, Kakinada, Andhra Pradesh 533006, India",
+          "area": "Indra Palem",
+          "city": "Kakinada",
+          "contactNumber": "9014031909",
+          "latitude": 16.96337393518291,
+          "longitude": 82.21710350364447,
+          "name": "X678+CRG",
+          "userId": "jb1GOKjlZdaVG3uUftJIKcUh9j62"
+        },
+        "1738316681566": {
+          "UserName": "Gsvsg",
+          "WorkType": "Home",
+          "address": "Flat no, VV Vintage Boulevard, 101/A, Somajiguda, Hyderabad, Telangana 500082, India",
+          "area": "Somajiguda",
+          "city": "Hyderabad",
+          "contactNumber": "6564",
+          "latitude": 17.4265519,
+          "longitude": 78.4575145,
+          "name": "CLIM IT SOLUTIONS",
+          "userId": "jb1GOKjlZdaVG3uUftJIKcUh9j62"
+        },
+        "1738317394495": {
+          "UserName": "Gsggs",
+          "WorkType": "Work",
+          "address": "Gadarada, Andhra Pradesh 533289, India",
+          "area": "Gadarada",
+          "city": "Gadarada",
+          "contactNumber": "4646",
+          "latitude": 17.1595854,
+          "longitude": 81.8852582,
+          "name": "Gadarada",
+          "userId": "jb1GOKjlZdaVG3uUftJIKcUh9j62"
+        },
+        "1738317654207": {
+          "UserName": "Bxbs",
+          "WorkType": "Home",
+          "address": "Punjagutta, Hyderabad, Telangana, India",
+          "area": "Punjagutta",
+          "city": "Hyderabad",
+          "contactNumber": "9897",
+          "latitude": 17.4254486,
+          "longitude": 78.450544,
+          "name": "Punjagutta",
+          "userId": "jb1GOKjlZdaVG3uUftJIKcUh9j62"
+        },
+        "1738321395231": {
+          "UserName": "Fgafs",
+          "WorkType": "Others",
+          "address": "San Francisco, CA, USA",
+          "area": "SoMa",
+          "city": "San Francisco",
+          "contactNumber": "5454",
+          "latitude": 37.7749295,
+          "longitude": -122.4194155,
+          "name": "San Francisco",
+          "userId": "jb1GOKjlZdaVG3uUftJIKcUh9j62"
+        }
+      }
+    },
+    "rOcMlM2nhSNMh1R6KAhWENmll1M2": {
+      "addresses": {
+        "1738655314370": {
+          "UserName": "Tarun Sai",
+          "WorkType": "Home",
+          "address": "Samarlakota Uppada Road, Ganesh Colony, Samarlakot, Andhra Pradesh, 533440, India",
+          "area": "Ganesh Colony",
+          "city": "Samarlakot",
+          "contactNumber": "8910542127",
+          "latitude": 17.0629293,
+          "longitude": 82.17849,
+          "name": "1-9-244",
+          "userId": "rOcMlM2nhSNMh1R6KAhWENmll1M2"
+        },
+        "1738656099226": {
+          "UserName": "Seshu",
+          "WorkType": "Home",
+          "address": "Dharam Karan Road, Ameerpet, Hyderabad, Telangana, 500016, India",
+          "area": "Ameerpet",
+          "city": "Hyderabad",
+          "contactNumber": "97665332221",
+          "latitude": 17.4424064,
+          "longitude": 78.4531456,
+          "name": "7-1-38/1/68",
+          "userId": "rOcMlM2nhSNMh1R6KAhWENmll1M2"
+        }
+      }
+    },
+    "x099INlwzwTEeuLqtrzorthINLt2": {
+      "addresses": {
+        "1738299457886": {
+          "UserName": "Sasi kiran",
+          "WorkType": "Home",
+          "address": "Samarlakota, Andhra Pradesh, India",
+          "area": "Nimmathota",
+          "city": "Samarlakota",
+          "contactNumber": "94645544545",
+          "latitude": 17.0500453,
+          "longitude": 82.1679386,
+          "name": "Samarlakota",
+          "userId": "x099INlwzwTEeuLqtrzorthINLt2"
+        },
+        "1738299500591": {
+          "UserName": "Seshu",
+          "WorkType": "Work",
+          "address": "Flat no, VV Vintage Boulevard, 101/A, Somajiguda, Hyderabad, Telangana 500082, India",
+          "area": "Somajiguda",
+          "city": "Hyderabad",
+          "contactNumber": "959655",
+          "latitude": 17.4265519,
+          "longitude": 78.4575145,
+          "name": "CLIM IT SOLUTIONS",
+          "userId": "x099INlwzwTEeuLqtrzorthINLt2"
+        },
+        "1738574599891": {
+          "UserName": "Fzgsgg",
+          "WorkType": "Others",
+          "address": "70-3-30/1, RTC Colony, Ramanayapeta, Kakinada, Andhra Pradesh 533005, India",
+          "area": "Ramanayapeta",
+          "city": "Kakinada",
+          "contactNumber": "575757",
+          "latitude": 16.99215065866051,
+          "longitude": 82.24811285734177,
+          "name": "70-3-30/1",
+          "userId": "x099INlwzwTEeuLqtrzorthINLt2"
+        },
+        "1738574600434": {
+          "UserName": "Fzgsgg",
+          "WorkType": "Others",
+          "address": "70-3-30/1, RTC Colony, Ramanayapeta, Kakinada, Andhra Pradesh 533005, India",
+          "area": "Ramanayapeta",
+          "city": "Kakinada",
+          "contactNumber": "575757",
+          "latitude": 16.99215065866051,
+          "longitude": 82.24811285734177,
+          "name": "70-3-30/1",
+          "userId": "x099INlwzwTEeuLqtrzorthINLt2"
+        }
+      }
+    }
+  },
+  "services": {
+    "service1": {
+        "designId": "design1",
+        "name": "Yashodha Hospital",
+        "address": "6-3-905, Raj Bhavan Rd, Matha Nagar, Somajiguda, Hyderabad, Telangana 500082",
+        "imageUrl": "https://rawahealth.com/wp-content/uploads/2024/10/Yashoda_Hospitals_Somajiguda-removebg-preview.jpg",
+        "Timings": "Opens 24/7",
+        "contactNumber": "9014031909"
+    },
+    "service2": {
+        "designId": "design1",
+        "name": "Clim It Solutions",
+        "address": "Flat no, VV Vintage Boulevard, 101/A, Somajiguda, Hyderabad, Telangana 500082",
+        "imageUrl": "https://i.ibb.co/PsBdS2PC/sxas.jpg",
+        "Timings": "Mon-Fri 9:30am-6:30pm",
+        "contactNumber": "8639515454"
+        }
+    }
+}

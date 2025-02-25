@@ -1,0 +1,986 @@
+primepicks.js
+
+import React, { useEffect, useState } from 'react';
+import { View, Platform, Text, Image, StyleSheet, ScrollView, StatusBar, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from './firebaseConfig'; // Import the shared Firebase instance
+
+const PrimePicks = ({ route }) => {
+  const navigation = useNavigation();
+  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const { area, city, region } = route.params?.location || { area: 'Unknown', city: 'Unknown', region: 'Unknown' };
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const q = query(collection(db, 'services'), where('area', '==', area));
+        const querySnapshot = await getDocs(q);
+        const servicesData = [];
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          servicesData.push({
+            id: doc.id,
+            imageUrl: data.imageUrl || '', // Default value if not found
+            name: data.name || 'Unknown Service', // Default value if not found
+          });
+        });
+        setServices(servicesData);
+      } catch (error) {
+        console.error("Error fetching services: ", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchServices();
+  }, [area]);
+
+  const fallbackImage = 'https://via.placeholder.com/60'; // Fallback image URL
+
+  return (
+    <View style={{ flex: 1, backgroundColor: '#ffffff' }}>
+      <StatusBar barStyle="light-content" backgroundColor="#009688" translucent={true} />
+
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Image source={require('../assets/back.png')} style={styles.backIcon} />
+        </TouchableOpacity>
+        <Text style={styles.heading}>PRIME PICKS</Text>
+        <View style={styles.emptyView}></View>
+      </View>
+
+      {/* Main Content */}
+      <View style={styles.content}>
+        {loading ? (
+          <ActivityIndicator size="large" color="#009688" style={styles.loader} />
+        ) : (
+          <ScrollView style={styles.scrollContainer}>
+            {services.length > 0 ? (
+              services.map((service) => (
+                <View key={service.id} style={styles.card}>
+                  <Image
+                    source={{ uri: service.imageUrl || fallbackImage }}
+                    style={styles.cardImage}
+                    onError={(e) => (e.nativeEvent.target.src = fallbackImage)}
+                  />
+                  <View>
+                    <Text style={styles.cardTitle}>{service.name}</Text>
+                  </View>
+                </View>
+              ))
+            ) : (
+              <Text style={styles.noData}>No services available in this area.</Text>
+            )}
+          </ScrollView>
+        )}
+      </View>
+
+      {/* Bottom Navigation */}
+      <View style={styles.bottomNav}>
+        <NavIcon
+          title="Home"
+          iconSource={require('../assets/home.png')}
+          onPress={() => navigation.navigate('Home')}
+        />
+        <NavIcon
+          title="Notifications"
+          iconSource={require('../assets/bell.png')}
+          onPress={() => navigation.navigate('Notifications')}
+        />
+        <NavIcon
+          title="Offers"
+          iconSource={require('../assets/offer.png')}
+          onPress={() => navigation.navigate('Offers')}
+        />
+        <NavIcon
+          title="Favorites"
+          iconSource={require('../assets/heart.png')}
+          onPress={() => navigation.navigate('Favorites')}
+        />
+      </View>
+    </View>
+  );
+};
+
+// NavIcon component
+const NavIcon = ({ title, iconSource, onPress }) => (
+  <TouchableOpacity style={styles.navItem} onPress={onPress}>
+    <Image source={iconSource} style={styles.navIcon} />
+    <Text style={styles.navText}>{title}</Text>
+  </TouchableOpacity>
+);
+
+export default PrimePicks;
+
+const styles = StyleSheet.create({
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    backgroundColor: '#009688',
+    paddingHorizontal: 15,
+    paddingVertical: 20,
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 22 : 60,
+  },
+  backIcon: {
+    width: 30,
+    height: 30,
+    tintColor: '#ffffff',
+  },
+  heading: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#ffffff',
+    flex: 1,
+    textAlign: 'center',
+  },
+  emptyView: { width: 30 },
+  loader: { marginTop: 50 },
+  content: { flex: 1, paddingBottom: 60 }, // Added padding for bottom navigation space
+  scrollContainer: {
+    paddingHorizontal: 15,
+    paddingTop: 10,
+  },
+  card: {
+    flexDirection: 'row',
+    backgroundColor: '#f8f8f8',
+    marginBottom: 10,
+    borderRadius: 10,
+    padding: 10,
+    elevation: 3,
+    alignItems: 'center',
+  },
+  cardImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    marginRight: 15,
+  },
+  cardTitle: { fontSize: 16, fontWeight: 'bold' },
+  noData: { textAlign: 'center', fontSize: 16, color: '#666666', marginTop: 50 },
+  bottomNav: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    backgroundColor: '#009688',
+    paddingVertical: 10,
+    position: 'absolute', // Fix at bottom
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  navItem: {
+    alignItems: 'center',
+  },
+  navIcon: {
+    width: 24,
+    height: 24,
+  },
+  navText: {
+    color: '#ffffff',
+    fontSize: 12,
+    marginTop: 5,
+  },
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+teo.js
+
+
+import React, { useState, useEffect } from 'react';
+import { View, Text, Image, StyleSheet, Platform, StatusBar, TouchableOpacity, ScrollView } from 'react-native';
+import { db } from './firebaseConfig'; // Import Firestore instance
+import { query, collection, where, getDocs } from 'firebase/firestore'; // Correct Firebase imports
+
+const Teo = ({ navigation, route }) => {
+  // Destructure location object passed from the home screen
+  const { area, city, region } = route.params?.location || { area: 'Unknown', city: 'Unknown', region: 'Unknown' };
+
+  const [services10th, setServices10th] = useState([]);
+  const [servicesIntermediate, setServicesIntermediate] = useState([]);
+  const [servicesGraduation, setServicesGraduation] = useState([]);
+  const [loading10th, setLoading10th] = useState(true);
+  const [loadingIntermediate, setLoadingIntermediate] = useState(true);
+  const [loadingGraduation, setLoadingGraduation] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    // Debug: log the area value to ensure it's being passed correctly
+    console.log('Area from Route:', area); 
+
+    const fetchServices = async () => {
+      try {
+        console.log('Fetching data for area:', area);
+
+        // Fetch 10th/SSC data
+        const q10th = query(
+          collection(db, 'education'),
+          where('area', '==', area),
+          where('category', '==', '10th/SSC')
+        );
+        const querySnapshot10th = await getDocs(q10th);
+        const servicesData10th = querySnapshot10th.docs.map((doc) => ({
+          id: doc.id,
+          imageUrl: doc.data().imageUrl || '',
+          name: doc.data().name || 'Unknown Education',
+          courses: JSON.parse(doc.data().courses || '[]'),
+        }));
+        setServices10th(servicesData10th);
+
+        // Fetch Intermediate/12th data
+        const qIntermediate = query(
+          collection(db, 'education'),
+          where('area', '==', area),
+          where('category', '==', 'Intermediate/12th')
+        );
+        const querySnapshotIntermediate = await getDocs(qIntermediate);
+        const servicesDataIntermediate = querySnapshotIntermediate.docs.map((doc) => ({
+          id: doc.id,
+          imageUrl: doc.data().imageUrl || '',
+          name: doc.data().name || 'Unknown Education',
+          courses: JSON.parse(doc.data().courses || '[]'),
+        }));
+        setServicesIntermediate(servicesDataIntermediate);
+
+        // Fetch Graduation data
+        const qGraduation = query(
+          collection(db, 'education'),
+          where('area', '==', area),
+          where('category', '==', 'Graduation')
+        );
+        const querySnapshotGraduation = await getDocs(qGraduation);
+        const servicesDataGraduation = querySnapshotGraduation.docs.map((doc) => ({
+          id: doc.id,
+          imageUrl: doc.data().imageUrl || '',
+          name: doc.data().name || 'Unknown Education',
+          courses: JSON.parse(doc.data().courses || '[]'),
+        }));
+        setServicesGraduation(servicesDataGraduation);
+      } catch (err) {
+        console.error('Error fetching services:', err);
+        setError('Failed to fetch educational services.');
+      } finally {
+        setLoading10th(false);
+        setLoadingIntermediate(false);
+        setLoadingGraduation(false);
+      }
+    };
+
+    fetchServices();
+  }, [area]); // Dependency on area to refetch data if area changes
+
+  return (
+    <View style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+          accessible={true}
+          accessibilityLabel="Go Back"
+        >
+          <Image source={require('../assets/back.png')} style={styles.backIcon} />
+        </TouchableOpacity>
+        <Text style={styles.heading}>TOP EDUCATIONAL ORGANIZATIONS</Text>
+        <View style={styles.emptyView}></View>
+      </View>
+
+      {/* Main Content */}
+      <ScrollView style={styles.scrollView}>
+        {error && <Text style={styles.errorText}>{error}</Text>}
+
+        {/* 10th/SSC Section */}
+        <View style={styles.section}>
+          <Text style={styles.title}>10th/SSC</Text>
+          {loading10th ? (
+            <Text>Loading...</Text>
+          ) : (
+            services10th.map((service) => (
+              <View key={service.id} style={styles.card}>
+                <Image source={{ uri: service.imageUrl }} style={styles.image} />
+                <View style={styles.cardContent}>
+                  <Text style={styles.cardTitle}>{service.name}</Text>
+                  <Text style={styles.cardText}>Courses Offered:</Text>
+                  {service.courses.map((course, index) => (
+                    <Text key={index} style={styles.cardText}>• {course}</Text>
+                  ))}
+                </View>
+              </View>
+            ))
+          )}
+        </View>
+
+        {/* Intermediate/12th Section */}
+        <View style={styles.section}>
+          <Text style={styles.title}>Intermediate/12th</Text>
+          {loadingIntermediate ? (
+            <Text>Loading...</Text>
+          ) : (
+            servicesIntermediate.map((service) => (
+              <View key={service.id} style={styles.card}>
+                <Image source={{ uri: service.imageUrl }} style={styles.image} />
+                <View style={styles.cardContent}>
+                  <Text style={styles.cardTitle}>{service.name}</Text>
+                  <Text style={styles.cardText}>Courses Offered:</Text>
+                  {service.courses.map((course, index) => (
+                    <Text key={index} style={styles.cardText}>• {course}</Text>
+                  ))}
+                </View>
+              </View>
+            ))
+          )}
+        </View>
+
+        {/* Graduation Section */}
+        <View style={styles.section}>
+          <Text style={styles.title}>Graduation</Text>
+          {loadingGraduation ? (
+            <Text>Loading...</Text>
+          ) : (
+            servicesGraduation.map((service) => (
+              <View key={service.id} style={styles.card}>
+                <Image source={{ uri: service.imageUrl }} style={styles.image} />
+                <View style={styles.cardContent}>
+                  <Text style={styles.cardTitle}>{service.name}</Text>
+                  <Text style={styles.cardText}>Courses Offered:</Text>
+                  {service.courses.map((course, index) => (
+                    <Text key={index} style={styles.cardText}>• {course}</Text>
+                  ))}
+                </View>
+              </View>
+            ))
+          )}
+        </View>
+      </ScrollView>
+    </View>
+  );
+};
+
+export default Teo;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    backgroundColor: '#009688',
+    paddingHorizontal: 15,
+    paddingVertical: 20,
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 22 : 60,
+  },
+  backIcon: {
+    width: 30,
+    height: 30,
+    tintColor: '#ffffff',
+  },
+  heading: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#ffffff',
+    flex: 1,
+    textAlign: 'center',
+  },
+  emptyView: { width: 30 },
+  scrollView: {
+    flex: 1,
+  },
+  section: {
+    paddingHorizontal: 20,
+    paddingBottom: 30,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  card: {
+    flexDirection: 'row',
+    backgroundColor: '#f9f9f9',
+    borderRadius: 8,
+    overflow: 'hidden',
+    elevation: 2,
+    marginBottom: 15,
+    padding: 10,
+  },
+  image: {
+    width: 100,
+    height: 100,
+  },
+  cardContent: {
+    flex: 1,
+    padding: 10,
+  },
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  cardText: {
+    fontSize: 14,
+    color: '#555',
+  },
+  errorText: {
+    color: 'red',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import React, { useEffect, useState } from 'react';
+import { View, Text, Image, StyleSheet, FlatList, StatusBar, ActivityIndicator, TouchableOpacity, RefreshControl, Platform } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { collection, query, where, getDocs, limit } from 'firebase/firestore';
+import { db } from './firebaseConfig';
+import { getDatabase, ref, get } from 'firebase/database';
+import { getAuth } from 'firebase/auth';
+
+const PrimePicks = () => {
+  const navigation = useNavigation();
+  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [location, setLocation] = useState({ area: 'Unknown', city: 'Unknown', region: 'Unknown' });
+
+  const largeCities = ['Hyderabad', 'Bangalore', 'Mumbai']; // Example list of large cities
+
+  useEffect(() => {
+    const fetchLocationData = async () => {
+      try {
+        const auth = getAuth();
+        const userId = auth.currentUser?.uid;
+
+        if (!userId) {
+          console.error('No user is logged in.');
+          return;
+        }
+
+        const dbRef = getDatabase();
+        const locationRef = ref(dbRef, `SavedUsers/${userId}/SavedAddress`);
+        const snapshot = await get(locationRef);
+
+        if (snapshot.exists()) {
+          const locationData = snapshot.val();
+          const { area, city, region } = locationData || {};
+          console.log('Fetched location data:', { area, city, region });
+          setLocation({ area, city, region });
+          fetchServices(area, city); // Pass both area and city
+        } else {
+          console.warn('No location data found.');
+        }
+      } catch (error) {
+        console.error('Error fetching location data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLocationData();
+  }, []);
+
+  // Check if city is large (you can customize this based on your use case)
+  const isLargeCity = (city) => largeCities.includes(city);
+
+  const fetchServices = async (area, city) => {
+    if (!area && !city) return;
+
+    try {
+      setLoading(true);
+
+      let queryCondition;
+      
+      // If it's a large city, search by area
+      if (isLargeCity(city)) {
+        queryCondition = where('area', '==', area);
+        console.log("Fetching services for large city by area:", area);
+      } else {
+        // If it's a small city, search by city
+        queryCondition = where('city', '==', city);
+        console.log("Fetching services for small city by city:", city);
+      }
+
+      const q = query(collection(db, 'services'), queryCondition, limit(10));
+      const querySnapshot = await getDocs(q);
+      const servicesData = [];
+
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        servicesData.push({
+          id: doc.id,
+          imageUrl: data.imageUrl || '',
+          name: data.name || 'Unknown Service',
+        });
+      });
+      setServices(servicesData);
+    } catch (error) {
+      console.error('Error fetching services: ', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchServices(location.area, location.city);
+    setRefreshing(false);
+  };
+
+  const fallbackImage = 'https://via.placeholder.com/60';
+
+  const EmptyState = ({ message }) => (
+    <View style={styles.emptyStateContainer}>
+      <Text style={styles.emptyStateText}>{message}</Text>
+    </View>
+  );
+
+  return (
+    <View style={{ flex: 1, backgroundColor: '#ffffff' }}>
+      <StatusBar barStyle="light-content" backgroundColor="#009688" translucent={true} />
+
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+          accessibilityLabel="Go back"
+          accessibilityRole="button"
+        >
+          <Image source={require('../assets/back.png')} style={styles.backIcon} />
+        </TouchableOpacity>
+        <Text style={styles.heading}>PRIME PICKS</Text>
+        <View style={styles.emptyView}></View>
+      </View>
+
+      {/* Main Content */}
+      <View style={styles.content}>
+        {loading ? (
+          <ActivityIndicator size="large" color="#009688" style={styles.loader} />
+        ) : (
+          <FlatList
+            data={services}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <View style={styles.card}>
+                <Image
+                  source={{ uri: item.imageUrl || fallbackImage }}
+                  style={styles.cardImage}
+                />
+                <View>
+                  <Text style={styles.cardTitle}>{item.name}</Text>
+                </View>
+              </View>
+            )}
+            ListEmptyComponent={
+              <EmptyState message="No services available in this area." />
+            }
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+          />
+        )}
+      </View>
+            {/* Bottom Navigation */}
+            <View style={styles.bottomNav}>
+        <NavIcon
+          title="Home"
+          iconSource={require('../assets/home.png')}
+          onPress={() => navigation.navigate('Home')}
+        />
+        <NavIcon
+          title="Notifications"
+          iconSource={require('../assets/bell.png')}
+          onPress={() => navigation.navigate('Notifications')}
+        />
+        <NavIcon
+          title="Offers"
+          iconSource={require('../assets/offer.png')}
+          onPress={() => navigation.navigate('Offers')}
+        />
+        <NavIcon
+          title="Favorites"
+          iconSource={require('../assets/heart.png')}
+          onPress={() => navigation.navigate('Favorites')}
+        />
+      </View>
+    </View>
+  );
+};
+
+
+
+// NavIcon component
+const NavIcon = ({ title, iconSource, onPress }) => (
+  <TouchableOpacity style={styles.navItem} onPress={onPress}>
+    <Image source={iconSource} style={styles.navIcon} />
+    <Text style={styles.navText}>{title}</Text>
+  </TouchableOpacity>
+);
+
+
+export default PrimePicks;
+
+const styles = StyleSheet.create({
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    backgroundColor: '#009688',
+    paddingHorizontal: 15,
+    paddingVertical: 20,
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 22 : 70,
+  },
+  backIcon: {
+    width: 30,
+    height: 30,
+    tintColor: '#ffffff',
+  },
+  heading: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#ffffff',
+    flex: 1,
+    textAlign: 'center',
+  },
+  emptyView: { width: 30 },
+  loader: { marginTop: 50 },
+  content: { flex: 1, paddingBottom: 60 }, // Added padding for bottom navigation space
+  scrollContainer: {
+    paddingHorizontal: 15,
+    paddingTop: 10,
+  },
+  card: {
+    flexDirection: 'row',
+    backgroundColor: '#f8f8f8',
+    marginBottom: 10,
+    borderRadius: 10,
+    padding: 10,
+    elevation: 3,
+    alignItems: 'center',
+  },
+  cardImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    marginRight: 15,
+  },
+  cardTitle: { fontSize: 16, fontWeight: 'bold' },
+  noData: { textAlign: 'center', fontSize: 16, color: '#666666', marginTop: 50 },
+  bottomNav: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    backgroundColor: '#009688',
+    paddingVertical: 10,
+    position: 'absolute', // Fix at bottom
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  navItem: {
+    alignItems: 'center',
+  },
+  navIcon: {
+    width: 24,
+    height: 24,
+  },
+  navText: {
+    color: '#ffffff',
+    fontSize: 12,
+    marginTop: 5,
+  },
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#f9f9f9' },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between', // Distribute space evenly between elements
+    alignItems: 'flex-end',
+    padding: 15,
+    backgroundColor: '#2c9d92',
+    height: Platform.OS === 'ios' ? 120 : 110,
+  },
+  leftContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+  },
+  avatar: {
+    width: 50,
+    height: 50,
+    marginRight: 10,
+    borderRadius: 25,
+  },
+  location: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  subLocation: {
+    color: '#d3f3f2',
+    paddingBottom: 5,
+  },
+  cartIcon: {
+    color: '#fff',
+    fontSize: 28,
+    paddingBottom:'7'
+  },
+  content: { padding: 15 },
+  introTitle: { fontSize: Platform.OS === 'ios' ? 27 : 23, fontWeight: 'bold', textAlign: 'center', color: '#333', paddingTop: '15', paddingBottom: '10' },
+  subtitle: { textAlign: 'center', color: 'purple', marginBottom: 20 },
+  card: 
+  { 
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 15,
+    shadowColor: '#000', 
+    shadowOffset: { width: 0, height: 2 }, 
+    shadowOpacity: 0.25, 
+    shadowRadius: 3.84, 
+    elevation: 5,
+   },
+  cardContent: { flexDirection: 'row', alignItems: 'center' },
+  cardImage: { width: 150, height: 150, borderRadius: 10, marginRight: 15 },
+  cardTextContainer: { flex: 1 },
+  cardTitle: { fontSize: 20, fontWeight: 'bold', textAlign: 'left', paddingBottom: '10' },
+  cardDescription: { fontSize: 12, color: '#666', textAlign: 'left' },
+  
+  
+  
+  
+  
+  exploreButton: {
+    backgroundColor: '#FF8C00', // Orange color
+    borderRadius: 10,
+    
+    paddingVertical: 8,
+    marginTop: 20, 
+    width: Platform.OS === 'android' ? '90%' : '70%',
+    
+    shadowColor: '#000', 
+    shadowOffset: { width: 0, height: 2 }, 
+    shadowOpacity: 0.25, 
+    shadowRadius: 3.84, 
+    elevation: 5,
+    fontSize: '16', 
+    alignItems: 'left',
+  },
+  exploreText: {
+    color: '#fff', 
+    fontWeight: 'bold',
+    textAlign: 'center',
+    textAlignVertical:'center'
+  },
+  
+  sectionTitle: { fontSize: 20, fontWeight: 'bold', marginVertical: 10 },
+  eventSection: { marginVertical: 10 },
+  eventImageContainer: { width: Platform.OS === 'ios' ? 360 : 310, height: Platform.OS === 'ios' ? 200 : 170, marginRight: 15 },
+  eventImage: { width: '100%', height: '100%', borderRadius: 10 },
+  collabSection: { 
+    marginVertical: 15, 
+    padding: 15, 
+    backgroundColor: '#2c9d92', 
+    borderRadius: 10, 
+    marginBottom: 30,
+    shadowColor: '#000', 
+    shadowOffset: { width: 0, height: 2 }, 
+    shadowOpacity: 0.25, 
+    shadowRadius: 3.84, 
+    elevation: 10, 
+  },
+  collabTitle: { fontSize: 30, fontWeight: 'bold', color: '#fff', textAlign: 'center' },
+  collabSubtitle: { color: '#000000', marginVertical: 10, height: 150, backgroundColor: 'white', padding: 10, textAlignVertical: 'center', textAlign: 'center', borderRadius: 8, fontSize: Platform.OS === 'ios' ? 20 : 18 },
+  collabButton: { backgroundColor: 'orange', padding: 10, borderRadius: 5 },
+  buttonText: { color: '#fff', textAlign: 'center', fontWeight: 'bold' },
+  bottomNav: { flexDirection: 'row', justifyContent: 'space-around', backgroundColor: '#009688', paddingVertical: 10 },
+  navItem: { alignItems: 'center' },
+  navIcon: { width: 24, height: 24 },
+  navText: { color: '#ffffff', fontSize: 12, marginTop: 5 },
+
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import React, { useEffect, useState } from 'react';
+import { View, Text, Image, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from './firebaseConfig';
+
+const ServiceDetails = ({ route }) => {
+  const { serviceId, designId } = route.params;
+  const [serviceData, setServiceData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchServiceDetails();
+  }, []);
+
+  const fetchServiceDetails = async () => {
+    try {
+      const docRef = doc(db, 'services', serviceId);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        setServiceData(docSnap.data());
+      } else {
+        console.error('No service data found');
+      }
+    } catch (error) {
+      console.error('Error fetching service details:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return <ActivityIndicator size="large" color="#009688" style={styles.loader} />;
+  }
+
+  if (!serviceData) {
+    return <Text style={styles.noData}>Service details not found.</Text>;
+  }
+
+  return (
+    <ScrollView contentContainerStyle={styles.container}>
+      {designId === 'design1' && serviceData ? (
+        <View style={styles.design1Container}>
+          <Text style={styles.title}>{serviceData.name}</Text>
+          <Image source={{ uri: serviceData.imageUrl }} style={styles.image} />
+          <Text>{serviceData.description}</Text>
+        </View>
+      ) : designId === 'design2' && serviceData ? (
+        <View style={styles.design2Container}>
+          <Text style={styles.title}>{serviceData.name}</Text>
+          <Text>Special Features: {serviceData.features}</Text>
+        </View>
+      ) : designId === 'design3' && serviceData ? (
+        <View style={styles.design3Container}>
+          <Text style={styles.title}>{serviceData.name}</Text>
+          <Text>{serviceData.additionalInfo}</Text>
+        </View>
+      ) : designId === 'design4' && serviceData ? (
+        <View style={styles.design4Container}>
+          <Text style={styles.title}>{serviceData.name}</Text>
+          <Image source={{ uri: serviceData.bannerUrl }} style={styles.bannerImage} />
+          <Text>Contact: {serviceData.contactDetails}</Text>
+        </View>
+      ) : (
+        <Text style={styles.noData}>Invalid design or no content available.</Text>
+      )}
+    </ScrollView>
+  );
+};
+
+export default ServiceDetails;
+
+const styles = StyleSheet.create({
+  container: { flexGrow: 1, padding: 16 },
+  loader: { marginTop: 50 },
+  noData: { textAlign: 'center', fontSize: 16, color: '#666666', marginTop: 50 },
+  design1Container: {
+    backgroundColor: '#f8f8f8',
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  design2Container: {
+    backgroundColor: '#e0f7fa',
+    padding: 16,
+    borderRadius: 8,
+  },
+  design3Container: {
+    backgroundColor: '#f3e5f5',
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  design4Container: {
+    backgroundColor: '#ffe0b2',
+    padding: 16,
+    borderRadius: 8,
+  },
+  title: { fontSize: 18, fontWeight: 'bold', marginBottom: 8 },
+  image: { width: '100%', height: 200, borderRadius: 8, marginBottom: 8 },
+  bannerImage: { width: '100%', height: 150, borderRadius: 8, marginBottom: 8 },
+});
+

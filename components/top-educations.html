@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Educational Organizations</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+       /* General Reset */
+       * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            color: #e6f7ff;
+            line-height: 1.6;
+            background-color: #f0f8ff;
+            min-height: 100vh;
+            overflow-y: scroll; /* Ensure body has a scrollbar */
+        }
+
+        /* Navbar */
+  .navbar {
+            display: flex;
+            position: fixed; /* Changed to fixed */
+            top: 0; /* Stick to the top */
+            left: 0; /* Ensure it covers the full width */
+            width: 100%; /* Ensure it covers the full width */
+            background-color: #008b8b;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            z-index: 100; 
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease; /* Add a smooth transition for background color */
+        }
+         /*.navbar.scrolled {
+            background-color: rgba(0, 139, 139, 0.9); /* Slightly transparent background when scrolled
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); More prominent shadow
+        } */
+        .logo {
+            font-size: 1.9rem;
+            font-weight: bold;
+            color: #ffde59; /* Logo color */
+            font-family: Gladolia DEMO;
+            cursor: pointer;
+        }
+
+        .logo a {  /* Style the <a> tag inside .logo */
+            color: inherit;
+            text-decoration: none;
+        }
+        
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            position: relative; /* Needed for positioning the pseudo-element */
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            height: 2px;
+            width: 0;
+            background-color: #ffffff; /* Color of the underline */
+            transition: width 0.3s ease; /* Smooth underline animation */
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        
+        .user-profile {
+            font-size: 1.5rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            margin-top: 50px; /* Adjusted margin to accommodate navbar */
+            padding: 20px; /* Add padding to the container */
+        }
+
+        .scroll-view {
+            flex: 1; /* Make scroll-view take up available space */
+            /* Remove overflow-y: auto;  This is the key change */
+            padding: 0; /* Remove padding from scroll-view */
+        }
+
+        .section {
+            margin-bottom: 20px;
+            margin-right: 60px;
+            margin-left: 60px;
+            /* Remove fixed height */
+            /* height: 200px; */  /* Remove this line */
+            min-height: 200px; /* Or use min-height if you want a minimum height */
+        }
+        .section h2{
+            color: #000;
+            margin-top: 15px;
+            margin-bottom: 0px;
+        }
+        .title {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .card {
+            display: flex;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            padding: 10px;
+            gap: 10px;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .image {
+            width: 100px;
+            height: 100px;
+            border: 2px solid black;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+        .card-content {
+            flex: 1;
+            padding: 10px;
+        }
+
+        .card-title {
+            font-size: 1em;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #080808;
+        }
+
+        .card-text {
+            font-size: 0.9em;
+            color: #2b2b2b;
+            margin-bottom: 3px;
+        }
+
+        .error-text {
+            color: red;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .loading-text {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1em;
+            color: #666;
+        }
+
+        .no-data-container {
+            text-align: center;
+            padding: 10px;
+            /* Remove fixed height */
+            /* height: 260px; */ /* Remove this line */
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+            /* Add margin to separate no-data containers */
+            margin-top: 10px;
+        }
+
+        .no-data-heading {
+            font-size: 0.9em;
+            font-weight: bold;
+            color: #080808;
+            margin-bottom: 10px;
+            margin-top: 5px;
+        }
+
+        .no-data-image {
+            width: 160px;
+            height: 150px;
+            margin: 10px auto;
+        }
+
+        .no-data-subtext {
+            font-size: 0.8em;
+            margin-bottom: 20px;
+            color: #2b2b2b;
+        }
+    
+    /* footer */
+    .footer {
+            background-color: #015550;
+            color: white;
+            text-align: center;
+            padding: 20px 10px;
+            font-family: Arial, sans-serif;
+            animation: fadeIn 1.5s ease-out 1s forwards; /* 1s delay */
+        }
+
+        .ffaa{
+            display: flex;
+            margin-bottom: 14px;
+        }
+        
+        .social-icons {
+            display: flex;
+            justify-content: flex-start;
+            gap: 15px;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease, color 0.3s ease;
+        }
+        
+        .social-icons i {
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .social-icons i:hover {
+        transform: scale(1.3);
+        color: #ffdf00;
+        }
+
+        .brand-name {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 34px;
+            font-weight: bold;
+            color: #ffdf00;
+            }
+
+        
+        .company-sections {
+            display: flex;
+            justify-content: center;
+            gap: 250px;
+            margin-bottom: 20px;
+        }
+        
+        .section h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        
+        .section ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .section li {
+            margin: 5px 0;
+        }
+        
+        .copyright {
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Top Navigation Bar -->
+  <header>
+    <nav class="navbar">
+        <div class="logo"><a href="index.html">One Quest</a></div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="#">Categories</a></li>
+            <li><a href="#">Wishlist</a></li>
+            <li><a href="#">Cart 🛒</a></li>
+        </ul>
+        <div class="user-profile">
+            <a href="components/profile.html"><img src="assets/prof.png" style="width: 40px; height: 40px;" alt="User Profile"  /></a>
+            <img src="assets/bell.png" style="width: 28px; height: 35px;" alt="Notifications" />
+        </div>
+    </nav>
+  </header>
+
+    <div class="container">
+        <div class="scroll-view" id="content">
+            <div id="error-text" class="error-text" style="display: none;"></div>
+            <div id="loading-text" class="loading-text">Loading...</div>
+            <div id="no-location-container" class="no-data-container" style="display:none">
+                <div class="no-data-heading">Oops!... Location not found. Please enable location services or provide a valid location.</div>
+                <img src="assets/ed.png" alt="No Data" class="no-data-image" onerror="this.src='placeholder.png'">
+                <div class="no-data-subtext">Ensure location permissions are granted to the app.</div>
+            </div>
+            <div id="10th-section" class="section">
+                <h2 class="title">10th/SSC</h2>
+                <div id="10th-container"></div>
+            </div>
+
+            <div id="intermediate-section" class="section">
+                <h2 class="title">Intermediate/12th</h2>
+                <div id="intermediate-container"></div>
+            </div>
+
+            <div id="graduation-section" class="section">
+                <h2 class="title">Graduation</h2>
+                <div id="graduation-container"></div>
+            </div>
+        </div>
+    </div>
+
+<!-- footer -->
+<footer class="footer">
+    <div class="ffaa">
+        <div class="social-icons">
+            <i class="fab fa-facebook"></i>
+            <i class="fa fa-envelope"></i>
+            <i class="fab fa-twitter"></i>
+        </div>
+        <p class="brand-name">One Quest</p>
+    </div>
+    <div class="company-sections">
+        <div class="section">
+            <h3>Company</h3>
+            <ul>
+                <li>Privacy Policy</li>
+                <li>About us</li>
+                <li>Partners</li>
+                <li>Contact Support</li>
+            </ul>
+        </div>
+        <div class="section">
+            <h3>Company</h3>
+            <ul>
+                <li>Privacy Policy</li>
+                <li>About us</li>
+                <li>Partners</li>
+                <li>Contact Support</li>
+            </ul>
+        </div>
+        <div class="section">
+            <h3>Company</h3>
+            <ul>
+                <li>Privacy Policy</li>
+                <li>About us</li>
+                <li>Partners</li>
+                <li>Contact Support</li>
+            </ul>
+        </div>
+    </div>
+    <p class="copyright">© 2024 Clim IT Solutions- All Rights Reserved</p>
+</footer>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+// Initialize Firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyAy_Lf6WnljttOxnjsdnHeJlk-hZsEKQJU",
+    authDomain: "onequestt.firebaseapp.com",
+    databaseURL: "https://onequestt-default-rtdb.firebaseio.com",
+    projectId: "onequestt",
+    storageBucket: "onequestt.firebasestorage.app",
+    messagingSenderId: "549898333490",
+    appId: "1:549898333490:web:a22f4b6e94176b11f33b2b",
+    measurementId: "G-YSTMPQZEEE"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const contentDiv = document.getElementById('content');
+const errorText = document.getElementById('error-text');
+const loadingText = document.getElementById('loading-text');
+const noLocationContainer = document.getElementById('no-location-container');
+
+const container10th = document.getElementById('10th-container');
+const containerIntermediate = document.getElementById('intermediate-container');
+const containerGraduation = document.getElementById('graduation-container');
+
+const area = localStorage.getItem('selectedArea') || 'Unknown';
+const city = localStorage.getItem('selectedCity') || 'Unknown';
+
+console.log("Area:", area, "City:", city);
+
+const isLocationIssue = area === 'Unknown' || city === 'Unknown';
+
+if (isLocationIssue) {
+    loadingText.style.display = 'none';
+    noLocationContainer.style.display = 'block';
+} else {
+    fetchServices('10th/SSC', container10th);
+    fetchServices('Intermediate/12th', containerIntermediate);
+    fetchServices('Graduation', containerGraduation);
+}
+
+async function fetchServices(category, container) {
+    try {
+        const q = query(
+            collection(db, 'education'),
+            where('area', '==', area),
+            where('category', '==', category)
+        );
+
+        const querySnapshot = await getDocs(q);
+        const services = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            imageUrl: doc.data().imageUrl || '',
+            name: doc.data().name || 'Unknown Education',
+            courses: JSON.parse(doc.data().courses || '[]'),
+        }));
+
+        if (services.length > 0) {
+            displayServices(services, container);
+        } else {
+            displayNoData(category, container);
+        }
+
+    } catch (err) {
+        console.error('Error fetching services:', err);
+        errorText.textContent = 'Failed to fetch educational services. Check the console for details.';
+        errorText.style.display = 'block';
+    } finally {
+        loadingText.style.display = 'none';
+    }
+}
+
+function displayServices(services, container) {
+    container.innerHTML = "";
+    services.forEach((service) => {
+        const card = document.createElement('div');
+        card.classList.add('card');
+        card.innerHTML = `
+            <img src="${service.imageUrl}" alt="${service.name}" class="image" onerror="this.src='placeholder.png'">
+            <div class="card-content">
+                <h3 class="card-title">${service.name}</h3>
+                <p class="card-text">Courses Offered:</p>
+                ${service.courses.map((course) => `<p class="card-text">• ${course}</p>`).join('')}
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+function displayNoData(category, container) {
+    container.innerHTML = ""; // Clear any previous content
+    const noDataContainer = document.createElement('div');
+    noDataContainer.classList.add('no-data-container');
+    noDataContainer.innerHTML = `
+        <div class="no-data-heading">No data available for ${category}</div>
+        <img src="assets/ed.png" alt="No Data" class="no-data-image" onerror="this.src='placeholder.png'">
+        <div class="no-data-subtext">We couldn't find any services for ${category} in this area.</div>
+    `;
+    container.appendChild(noDataContainer);
+}
+
+    </script>
+</body>
+</html>

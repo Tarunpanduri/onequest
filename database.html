@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - Manage Services</title>
+  <script type="module">
+    // Import Firebase SDKs
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getDatabase, ref, push, set, onValue, update, remove } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+
+    // Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyAy_Lf6WnljttOxnjsdnHeJlk-hZsEKQJU",
+        authDomain: "onequestt.firebaseapp.com",
+        databaseURL: "https://onequestt-default-rtdb.firebaseio.com/",
+        projectId: "onequestt",
+        storageBucket: "onequestt.firebasestorage.app",
+        messagingSenderId: "549898333490",
+        appId: "1:549898333490:web:a22f4b6e94176b11f33b2b",
+        measurementId: "G-YSTMPQZEEE"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // DOM Elements
+    const serviceList = document.getElementById("serviceList");
+    const addButton = document.getElementById("addService");
+
+    const serviceIdInput = document.getElementById("serviceId");
+    const nameInput = document.getElementById("name");
+    const addressInput = document.getElementById("address");
+    const contactInput = document.getElementById("contactNumber");
+    const timingsInput = document.getElementById("timings");
+    const imageUrlInput = document.getElementById("imageUrl");
+    const designIdInput = document.getElementById("designId");
+
+    // CREATE or UPDATE: Add or edit service
+    addButton.addEventListener("click", () => {
+      const serviceId = serviceIdInput.value || `service_${Date.now()}`;
+      const name = nameInput.value;
+      const address = addressInput.value;
+      const contactNumber = contactInput.value;
+      const timings = timingsInput.value;
+      const imageUrl = imageUrlInput.value;
+      const designId = designIdInput.value;
+
+      if (name && address && contactNumber && timings && imageUrl && designId) {
+        const serviceRef = ref(db, `services/${serviceId}`);
+        set(serviceRef, {
+          name: name,
+          address: address,
+          contactNumber: contactNumber,
+          timings: timings,
+          imageUrl: imageUrl,
+          designId: designId,
+          id: serviceId
+        }).then(() => {
+          alert("Service added or updated successfully!");
+          clearInputs();
+          fetchServices();
+        });
+      } else {
+        alert("Please fill in all fields.");
+      }
+    });
+
+    // READ: Fetch and display services
+    function fetchServices() {
+      serviceList.innerHTML = ""; // Clear existing content
+      const servicesRef = ref(db, `services`);
+
+      onValue(servicesRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          Object.entries(data).forEach(([id, item]) => {
+            renderServiceItem(id, item);
+          });
+        } else {
+          serviceList.innerHTML = "No services found.";
+        }
+      });
+    }
+
+    // Render individual service item
+    function renderServiceItem(id, item) {
+      const li = document.createElement("li");
+      li.innerHTML = `<strong>${id}</strong>: ${item.name} (${item.timings}) - ${item.address} <br>
+        <button onclick="editService('${id}')">Edit</button> 
+        <button onclick="deleteService('${id}')">Delete</button><hr>`;
+      serviceList.appendChild(li);
+    }
+
+    // UPDATE: Edit service
+    window.editService = function (id) {
+      const serviceRef = ref(db, `services/${id}`);
+      onValue(serviceRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          serviceIdInput.value = id;
+          nameInput.value = data.name;
+          addressInput.value = data.address;
+          contactInput.value = data.contactNumber;
+          timingsInput.value = data.timings;
+          imageUrlInput.value = data.imageUrl;
+          designIdInput.value = data.designId;
+        }
+      }, { onlyOnce: true });
+    };
+
+    // DELETE: Remove service
+    window.deleteService = function (id) {
+      remove(ref(db, `services/${id}`))
+        .then(() => {
+          alert("Service deleted successfully!");
+          fetchServices();
+        })
+        .catch((error) => {
+          alert("Error deleting service: " + error);
+        });
+    };
+
+    // Clear input fields
+    function clearInputs() {
+      serviceIdInput.value = "";
+      nameInput.value = "";
+      addressInput.value = "";
+      contactInput.value = "";
+      timingsInput.value = "";
+      imageUrlInput.value = "";
+      designIdInput.value = "";
+    }
+
+    // Fetch services on page load
+    fetchServices();
+  </script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    input {
+      margin: 5px 0;
+      padding: 8px;
+      width: 300px;
+    }
+    button {
+      margin: 5px 0;
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+    hr {
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Admin Panel - Manage Services</h1>
+
+  <h3>Add or Edit Service</h3>
+  <input type="text" id="serviceId" placeholder="Service ID (leave blank for new)" /><br />
+  <input type="text" id="name" placeholder="Service Name" /><br />
+  <input type="text" id="address" placeholder="Address" /><br />
+  <input type="text" id="contactNumber" placeholder="Contact Number" /><br />
+  <input type="text" id="timings" placeholder="Timings" /><br />
+  <input type="text" id="imageUrl" placeholder="Image URL" /><br />
+  <input type="text" id="designId" placeholder="Design ID" /><br />
+  <button id="addService">Save Service</button>
+
+  <h3>Service List</h3>
+  <ul id="serviceList"></ul>
+
+</body>
+</html>

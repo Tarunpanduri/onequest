@@ -1,0 +1,56 @@
+{
+  "project_info": {
+    "project_number": "549898333490",
+    "firebase_url": "https://onequestt-default-rtdb.firebaseio.com",
+    "project_id": "onequestt",
+    "storage_bucket": "onequestt.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:549898333490:android:46e1f7c4627b7c46f33b2b",
+        "android_client_info": {
+          "package_name": "com.onequestt.onequest"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "549898333490-5n0cmi208lkcqbnig8q4ujckcdkbt2gt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.onequestt.onequest",
+            "certificate_hash": "51cd3aa9fa4546daf7ed38e1de29166d8c71c913"
+          }
+        },
+        {
+          "client_id": "549898333490-hblevcd7lihept6bsgg3uvqsnk7sv8pa.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.onequestt.onequest",
+            "certificate_hash": "7113471544b8e6f06a8810f4196b60a9993da4a2"
+          }
+        },
+        {
+          "client_id": "549898333490-tt9aeq5b3aupb5g1tjje2o3shh1a7b3k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBYN-PFZtD-EWCtC9gDp9EQtLOY8d5hmZo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "549898333490-j11v34n0spaaj374maep3aqdg8k9vuql.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

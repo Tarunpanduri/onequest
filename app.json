@@ -1,0 +1,58 @@
+{
+  "expo": {
+    "name": "One Quest",
+    "slug": "onequest",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/logo.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "releaseChannel": "production",
+    "platforms": ["android", "ios"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.onequestt.onequest",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "This app needs access to your location to show your current position on the map."
+      },
+      "runtimeVersion": {
+        "policy": "appVersion"
+      }
+    },
+    "android": {
+      "googleServicesFile":"./google-services.json",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyA2JCMgl2RXOSgjPkObbvNcC8vR3yoy5qU"
+        }
+      },
+      "package": "com.onequestt.onequest",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/logo.png",
+        "backgroundColor": "#ffffff"
+      },
+      "runtimeVersion": "1.0.0"
+    },
+    "web": {
+      "favicon": "./assets/logo.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "11d5a43d-7d91-4b27-be56-3925f25272cd"
+      }
+    },
+    "plugins": [
+      "expo-video",
+      "expo-secure-store",
+      "expo-notifications"
+    ],
+    "updates": {
+      "url": "https://u.expo.dev/11d5a43d-7d91-4b27-be56-3925f25272cd"
+    }
+  }
+}

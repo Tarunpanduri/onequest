@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Push Notifications</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+<body>
+    <h2>Send Push Notifications</h2>
+    <textarea id="message" placeholder="Enter message"></textarea>
+    <button onclick="sendNotifications()">Send Notification</button>
+    
+    <h3>Saved Notification Tokens</h3>
+    <ul id="tokensList"></ul>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAy_Lf6WnljttOxnjsdnHeJlk-hZsEKQJU",
+            authDomain: "onequestt.firebaseapp.com",
+            databaseURL: "https://onequestt-default-rtdb.firebaseio.com/",
+            projectId: "onequestt",
+            storageBucket: "onequestt.appspot.com",
+            messagingSenderId: "549898333490",
+            appId: "1:549898333490:web:a22f4b6e94176b11f33b2b",
+            measurementId: "G-YSTMPQZEEE"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        function fetchTokens() {
+            db.ref("NotificationTokens").once("value", snapshot => {
+                const tokensList = document.getElementById("tokensList");
+                tokensList.innerHTML = "";
+                snapshot.forEach(childSnapshot => {
+                    const token = childSnapshot.val();
+                    const li = document.createElement("li");
+                    li.textContent = token;
+                    tokensList.appendChild(li);
+                });
+            });
+        }
+
+        async function sendNotifications() {
+            const message = document.getElementById("message").value;
+            if (!message) {
+                alert("Enter a message first");
+                return;
+            }
+            
+            db.ref("NotificationTokens").once("value", async snapshot => {
+                snapshot.forEach(async childSnapshot => {
+                    const token = childSnapshot.val();
+                    await fetch("https://exp.host/--/api/v2/push/send", {
+                        method: "POST",
+                        headers: {
+                            "Accept": "application/json",
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            to: token,
+                            sound: "default",
+                            title: "New Notification",
+                            body: message
+                        })
+                    });
+                });
+                alert("Notifications sent successfully!");
+            });
+        }
+
+        fetchTokens();
+    </script>
+</body>
+</html>
