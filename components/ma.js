@@ -15,7 +15,9 @@ import {
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import { useNavigation } from "@react-navigation/native";
-import { auth, database, ref, set } from './firebaseConfig';
+import { auth, database } from './firebaseConfig';
+import { ref, set } from "firebase/database"; // <-- Correct way!
+
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const AutocompleteMapScreen = () => {
