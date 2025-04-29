@@ -274,7 +274,7 @@ const HomeScreen = ({ navigation }) => {
     {/* Bottom Navigation */}
     <View style={styles.bottomNav}>
       <NavIcon title="Home" iconSource={require('../assets/home.png')} />
-      <NavIcon title="Offers" iconSource={require('../assets/offer.png')} />
+      <NavIcon title="Offers" iconSource={require('../assets/offer.png')} onPress={() => navigation.navigate('Scratch')}/>
       <NavIcon title="Favorites" iconSource={require('../assets/heart.png')}  onPress={() => navigation.navigate('wishlist')} />
       <NavIcon title="Profile" iconSource={require('../assets/profffff.png')} onPress={handleProfileClick} style={styles.naviconextra} />
     </View>
@@ -481,7 +481,15 @@ location: {
     textAlign: 'center',
     fontWeight: 'bold',
   },
-  bottomNav: { flexDirection: 'row', justifyContent: 'space-around', backgroundColor: '#009688', paddingVertical: 10, borderTopWidth:0.5 },
+  bottomNav: { flexDirection: 'row', justifyContent: 'space-around', backgroundColor: '#009688', paddingVertical: 10, 
+    borderTopColor: '#ccc',
+    // Shadow for iOS
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    // Shadow for Android
+    elevation: 5, },
   navItem: { alignItems: 'center' },
   naviconextra:{width: 25, height: 25},
   navIcon: { width: 28, height: 28 },

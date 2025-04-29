@@ -31,6 +31,8 @@ import maineded from './components/mainn';
 import ChatSupport from './components/chatsupport';
 import UpdateP from './components/updateprofile ';
 import wishlist from './components/whishlist';
+import Scratch from './components/scratch';
+
 
 
 
@@ -68,6 +70,7 @@ const App = () => {
         <Stack.Screen name="ChatSupport" component={ChatSupport} />
         <Stack.Screen name="UpdateP" component={UpdateP} />
         <Stack.Screen name="wishlist" component={wishlist} />
+        <Stack.Screen name="Scratch" component={Scratch} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -5,6 +5,8 @@ import { ref, get } from 'firebase/database';
 import { getAuth } from 'firebase/auth';
 import { database } from './firebaseConfig';
 import LottieView from 'lottie-react-native';
+import * as SecureStore from 'expo-secure-store'; // SecureStore for persistence
+
 
 const Wishlist = () => {
   const navigation = useNavigation();
@@ -12,6 +14,15 @@ const Wishlist = () => {
   const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showEmptyState, setShowEmptyState] = useState(false);
+
+  const handleProfileClick = async () => {
+    const isLoggedIn = await SecureStore.getItemAsync('isLoggedIn');
+    if (isLoggedIn === 'true') {
+      navigation.navigate('profile'); // Ensure Profile is registered in your navigator
+    } else {
+      navigation.navigate('login'); // Ensure Login is registered in your navigator
+    }
+  };
 
   useEffect(() => {
     const auth = getAuth();
@@ -107,13 +118,13 @@ const Wishlist = () => {
         )}
       </View>
 
-      {/* Fixed Bottom Navigation */}
-      <View style={styles.bottomNav}>
-        <NavIcon title="Home" iconSource={require('../assets/home.png')} onPress={() => navigation.navigate('Home')} />
-        <NavIcon title="Offers" iconSource={require('../assets/offer.png')} />
-        <NavIcon title="Wishlist" iconSource={require('../assets/heart.png')} onPress={() => navigation.navigate('Wishlist')} />
-        <NavIcon title="Profile" iconSource={require('../assets/profffff.png')} onPress={() => navigation.navigate('profile')} />
-      </View>
+          {/* Bottom Navigation */}
+          <View style={styles.bottomNav}>
+            <NavIcon title="Home" iconSource={require('../assets/home.png')} />
+            <NavIcon title="Offers" iconSource={require('../assets/offer.png')} onPress={() => navigation.navigate('Scratch')}/>
+            <NavIcon title="Favorites" iconSource={require('../assets/heart.png')}  onPress={() => navigation.navigate('wishlist')} />
+            <NavIcon title="Profile" iconSource={require('../assets/profffff.png')} onPress={handleProfileClick} style={styles.naviconextra} />
+          </View>
     </View>
   );
 };
@@ -145,8 +156,22 @@ const styles = StyleSheet.create({
   loginText: { fontSize: 16, color: 'gray', marginTop: 10, textAlign: 'center' },
   loginButton: { backgroundColor: '#009688', padding: 10, borderRadius: 8, marginTop: 15 },
   loginButtonText: { color: 'white', fontSize: 16, fontWeight: 'bold' },
-  bottomNav: { flexDirection: 'row', justifyContent: 'space-around', backgroundColor: '#009688', paddingVertical: 10, borderTopWidth: 0.5 },
-  navItem: { alignItems: 'center' },
+bottomNav: {
+  flexDirection: 'row',
+  justifyContent: 'space-around',
+  backgroundColor: '#009688',
+  paddingVertical: 10,
+  borderTopWidth: 0.5,
+  borderTopColor: '#ccc',
+  // Shadow for iOS
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: -2 },
+  shadowOpacity: 0.1,
+  shadowRadius: 3,
+  // Shadow for Android
+  elevation: 5,
+}
+,  navItem: { alignItems: 'center' },
   navIcon: { width: 28, height: 28 },
   navText: { color: '#ffffff', fontSize: 12, marginTop: 5 },
 });
