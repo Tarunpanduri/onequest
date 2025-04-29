@@ -13,7 +13,11 @@ import {
   Alert
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { getDatabase, ref, get } from 'firebase/database';
+import { AntDesign } from "@expo/vector-icons";
+import { getDatabase, ref, get,set } from 'firebase/database';
+import { auth } from "./firebaseConfig"; // Firebase authentication
+
+
 
 const ServiceDetails = ({ route }) => {
   const navigation = useNavigation();
@@ -23,10 +27,16 @@ const ServiceDetails = ({ route }) => {
   const [buttonName, setButtonName] = useState('');
   const [buttonLink, setButtonLink] = useState('');
   const [tagline, setTagline] = useState('');
+  const userId = auth.currentUser?.uid; // Get logged-in user ID
+  const db = getDatabase();
+
+  const [isWishlisted, setIsWishlisted] = useState(false);
+
 
   useEffect(() => {
     if (serviceId) {
       fetchServiceDetails();
+      checkWishlistStatus();
     } else {
       console.warn('No serviceId provided');
     }
@@ -42,7 +52,7 @@ const ServiceDetails = ({ route }) => {
         const data = snapshot.val();
         console.log('Service data retrieved:', data);
         setServiceData(data);
-        setTagline(data.tagline || ''); // Fetch tagline
+        setTagline(data.tagline || ''); 
         setButtonName(data.buttonName || '');
         setButtonLink(data.buttonLink || '');
       } else {
@@ -67,6 +77,36 @@ const ServiceDetails = ({ route }) => {
           }
         })
         .catch((err) => console.error('An error occurred while opening the link:', err));
+    }
+  };
+  const checkWishlistStatus = async () => {
+    if (!userId) return;
+    const wishlistRef = ref(db, `Wishlist/${userId}/${serviceId}`);
+    const snapshot = await get(wishlistRef);
+    if (snapshot.exists()) {
+      setIsWishlisted(true);
+    }
+  };
+
+  const handleWishlistToggle = () => {
+    if (!userId) {
+      Alert.alert("Login Required", "You must be logged in to add to wishlist.");
+      return;
+    }
+
+    const wishlistRef = ref(db, `Wishlist/${userId}/${serviceId}`);
+
+    if (isWishlisted) {
+      set(wishlistRef, null); // Remove from wishlist
+      setIsWishlisted(false);
+    } else {
+      set(wishlistRef, {
+        name: serviceData.name,
+        imageUrl: serviceData.imageUrl,
+        address: serviceData.address,
+        id: serviceId,
+      });
+      setIsWishlisted(true);
     }
   };
 
@@ -99,6 +139,9 @@ const ServiceDetails = ({ route }) => {
                         <Image source={{ uri: serviceData.imageUrl }} style={styles.image} />
                         <View style={styles.infoContainer}>
                           <Text style={[styles.infoTextt, styles.boldText]}>{serviceData.name}</Text>
+                          <TouchableOpacity onPress={handleWishlistToggle}>
+                            <AntDesign name={isWishlisted ? "heart" : "hearto"} size={24} color={isWishlisted ? "red" : "gray"} />
+                          </TouchableOpacity>
                         </View>
                         <View style={styles.infoContainer}>
                           <Text style={styles.label}>Address:</Text>
@@ -157,6 +200,9 @@ const ServiceDetails = ({ route }) => {
                             <Image source={{ uri: serviceData.imageUrl }} style={styles.image} />
                             <View style={styles.infoContainer}>
                               <Text style={[styles.infoTextt, styles.boldText]}>{serviceData.name}</Text>
+                              <TouchableOpacity onPress={handleWishlistToggle}>
+                            <AntDesign name={isWishlisted ? "heart" : "hearto"} size={24} color={isWishlisted ? "red" : "gray"} />
+                          </TouchableOpacity>
                             </View>
                             <View style={styles.infoContainer}>
                               <Text style={styles.label}>Address:</Text>
@@ -209,6 +255,9 @@ const ServiceDetails = ({ route }) => {
                            <Image source={{ uri: serviceData.imageUrl }} style={styles.image} />
                            <View style={styles.infoContainer}>
                              <Text style={[styles.infoTextt, styles.boldText]}>{serviceData.name}</Text>
+                             <TouchableOpacity onPress={handleWishlistToggle}>
+                                <AntDesign name={isWishlisted ? "heart" : "hearto"} size={24} color={isWishlisted ? "red" : "gray"} />
+                              </TouchableOpacity>
                            </View>
                            <View style={styles.infoContainer}>
                              <Text style={styles.label}>Address:</Text>
@@ -263,6 +312,9 @@ const ServiceDetails = ({ route }) => {
                           <Image source={{ uri: serviceData.imageUrl }} style={styles.image} />
                           <View style={styles.infoContainer}>
                             <Text style={[styles.infoTextt, styles.boldText]}>{serviceData.name}</Text>
+                            <TouchableOpacity onPress={handleWishlistToggle}>
+                              <AntDesign name={isWishlisted ? "heart" : "hearto"} size={24} color={isWishlisted ? "red" : "gray"} />
+                            </TouchableOpacity>
                           </View>
                           <View style={styles.infoContainer}>
                             <Text style={styles.label}>Address:</Text>

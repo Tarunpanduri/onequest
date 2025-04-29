@@ -54,7 +54,7 @@ const Wishlist = () => {
     // Delay empty state by 3 seconds
     setTimeout(() => {
       setShowEmptyState(true);
-    }, 1000);
+    }, 3000);
   };
 
   const handleServicePress = (serviceId, designId) => {
@@ -131,11 +131,11 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', paddingHorizontal: 15, paddingVertical: 20, paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 22 : 70 },
   heading: { fontSize: Platform.OS === 'ios' ? 22 : 18, fontWeight: 'bold', color: '#000000', flex: 1 },
   content: { flex: 1 }, // Ensures content takes remaining space
-  item: { flexDirection: 'row', marginBottom: 8, borderRadius: 8, backgroundColor: '#f5f5f5', margin: 10, },
-  image: { width: '45%', height: Platform.OS === 'ios' ? 140:120, borderRadius: 8, marginRight: 10 },
+  item: { flexDirection: 'row', marginBottom: 8, borderRadius: 8, backgroundColor: '#f5f5f5', margin: 10, padding: 10 },
+  image: { width: '35%', height: 100, borderRadius: 8, marginRight: 10 },
   textContainer: { flex: 1 },
-  name: { fontSize: Platform.OS === 'ios' ? 22:16, fontWeight: 'bold', flexWrap: 'wrap' ,marginTop:10},
-  address: { fontSize: Platform.OS === 'ios' ? 17:14, color: 'gray', flexWrap: 'wrap',marginTop:4 },
+  name: { fontSize: 16, fontWeight: 'bold', flexWrap: 'wrap' },
+  address: { fontSize: 14, color: 'gray', flexWrap: 'wrap' },
   loader: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   emptyWishlistContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   emptyText: { fontSize: Platform.OS === 'ios' ? 16 : 14, color: 'gray', marginTop: 10 },

@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Alert,Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Alert,Image,navigation } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { getDatabase, ref, push, set, onValue, serverTimestamp } from 'firebase/database';
 import { auth } from './firebaseConfig';
+import { useNavigation } from '@react-navigation/native';
+
 
 const ChatScreen = () => {
   const [tickets, setTickets] = useState([]); // Stores all user tickets
   const [selectedTicket, setSelectedTicket] = useState(null); // Current open ticket
   const [messages, setMessages] = useState([]); // Stores chat messages for selected ticket
   const [message, setMessage] = useState('');
+  const navigation = useNavigation();
+  
 
   const user = auth.currentUser;
   if (!user) {
