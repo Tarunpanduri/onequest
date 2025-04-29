@@ -4,7 +4,6 @@ import { useNavigation } from '@react-navigation/native';
 import { ref, get } from 'firebase/database';
 import { getAuth } from 'firebase/auth';
 import { database } from './firebaseConfig';
-import * as SecureStore from 'expo-secure-store';
 import LottieView from 'lottie-react-native';
 
 const Wishlist = () => {
@@ -85,7 +84,8 @@ const Wishlist = () => {
                   <Image source={{ uri: item.imageUrl }} style={styles.image} />
                   <View style={styles.textContainer}>
                     <Text style={styles.name}>{item.name}</Text>
-                    <Text style={styles.address} numberOfLines={2}>{item.address}</Text>
+                    <Text style={styles.address} numberOfLines={3}>{item.address}</Text>
+                    <Text style={styles.timings}>Timings: {item.timings}</Text>
                   </View>
                 </TouchableOpacity>
               )}
@@ -133,9 +133,10 @@ const styles = StyleSheet.create({
   content: { flex: 1 }, // Ensures content takes remaining space
   item: { flexDirection: 'row', marginBottom: 8, borderRadius: 8, backgroundColor: '#f5f5f5', margin: 10, padding: 10 },
   image: { width: '35%', height: 100, borderRadius: 8, marginRight: 10 },
-  textContainer: { flex: 1 },
-  name: { fontSize: 16, fontWeight: 'bold', flexWrap: 'wrap' },
-  address: { fontSize: 14, color: 'gray', flexWrap: 'wrap' },
+  textContainer: { flex: 1, justifyContent: 'space-between' },
+  name: { fontSize: 16, fontWeight: 'bold', flexWrap: 'wrap', },
+  address: { fontSize: 14, color: 'gray', flexWrap: 'wrap',Bottom:0 },
+  timings: { fontSize: 14, color: 'gray', flexWrap: 'wrap',marginBottom:5 },
   loader: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   emptyWishlistContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   emptyText: { fontSize: Platform.OS === 'ios' ? 16 : 14, color: 'gray', marginTop: 10 },

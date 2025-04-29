@@ -274,8 +274,8 @@ const HomeScreen = ({ navigation }) => {
     {/* Bottom Navigation */}
     <View style={styles.bottomNav}>
       <NavIcon title="Home" iconSource={require('../assets/home.png')} />
-      <NavIcon title="Offers" iconSource={require('../assets/offer.png')}  onPress={() => navigation.navigate('wishlist')}/>
-      <NavIcon title="Favorites" iconSource={require('../assets/heart.png')} />
+      <NavIcon title="Offers" iconSource={require('../assets/offer.png')} />
+      <NavIcon title="Favorites" iconSource={require('../assets/heart.png')}  onPress={() => navigation.navigate('wishlist')} />
       <NavIcon title="Profile" iconSource={require('../assets/profffff.png')} onPress={handleProfileClick} style={styles.naviconextra} />
     </View>
   </View>

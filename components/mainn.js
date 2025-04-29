@@ -100,6 +100,7 @@ const ServiceDetails = ({ route }) => {
         address: serviceData.address,
         id: serviceId,
         designId: designId,
+        timings: serviceData.timings,
       });
       setIsWishlisted(true);
     }
