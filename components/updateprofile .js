@@ -7,7 +7,10 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { getDatabase, ref, get, set, update } from "firebase/database";
 import { getAuth } from "firebase/auth";
 import { useNavigation } from '@react-navigation/native';
-import { app } from "./firebaseConfig"; // Ensure firebaseConfig.js is correctly set up
+import { app } from "./firebaseConfig"; 
+import * as Clipboard from 'expo-clipboard';
+
+
 
 const db = getDatabase(app);
 const auth = getAuth(app);
@@ -127,6 +130,19 @@ const ProfileScreen = () => {
           <View style={styles.container}>
             {/* Header with Profile Image */}
             <View style={styles.header}>
+
+            <TouchableOpacity 
+    style={styles.backButton} 
+    onPress={() => navigation.goBack()}
+  >
+    <Image 
+      source={require('../assets/back.png')} 
+      style={styles.backIcon} 
+    />
+  </TouchableOpacity>
+
+
+
               <View style={styles.profileContainer}>
                 <Image source={require('../assets/proff.png')} style={styles.profileImage} />
               </View>
@@ -299,6 +315,19 @@ height:20,
     justifyContent: 'center',
     alignItems: 'center',
   },
+  backButton: {
+    position: 'absolute',
+    top: 50,
+    left: 20,
+    zIndex: 2,
+  },
+  
+  backIcon: {
+    width: 24,
+    height: 24,
+    tintColor: 'white',
+  },
+  
 });
 
 export default ProfileScreen;

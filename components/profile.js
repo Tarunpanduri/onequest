@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
       justifyContent: 'flex-start',
 
     },
-    backIcon: { width: 17, height: 17, tintColor:'#000000' ,marginTop:60,marginBottom:-52, },
+    backIcon: {     width: 24,height: 24, tintColor:'#000000' ,marginTop:60,marginBottom:-52, },
   container: { flex: 1, backgroundColor: '#fff', paddingHorizontal: 20 },
   profileContainer: {
     flexDirection: 'row',
