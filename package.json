@@ -26,7 +26,7 @@
     "expo-auth-session": "~6.0.3",
     "expo-av": "~15.0.2",
     "expo-checkbox": "~4.0.0",
-    "expo-clipboard": "^7.0.1",
+    "expo-clipboard": "~7.0.1",
     "expo-dev-client": "~5.0.10",
     "expo-device": "~7.0.2",
     "expo-location": "^18.0.7",

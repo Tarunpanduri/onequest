@@ -1,32 +1,34 @@
-import React, { useEffect, useState, useRef, } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   View,
   Text,
   Image,
   ScrollView,
   StyleSheet,
-  Dimensions,StatusBar,Platform,TouchableOpacity
+  Dimensions,
+  StatusBar,
+  Platform,
+  TouchableOpacity,
+  Alert,
 } from "react-native";
 import { getDatabase, ref, onValue, off } from "firebase/database";
 import LottieView from "lottie-react-native";
-import { useNavigation } from '@react-navigation/native';
-import * as SecureStore from 'expo-secure-store'; // SecureStore for persistence
-
-
+import { useNavigation } from "@react-navigation/native";
+import * as SecureStore from "expo-secure-store";
+import * as Clipboard from "expo-clipboard";
 
 const UserNewsScratchScreen = () => {
   const [posts, setPosts] = useState([]);
   const navigation = useNavigation();
 
   const handleProfileClick = async () => {
-    const isLoggedIn = await SecureStore.getItemAsync('isLoggedIn');
-    if (isLoggedIn === 'true') {
-      navigation.navigate('profile'); // Ensure Profile is registered in your navigator
+    const isLoggedIn = await SecureStore.getItemAsync("isLoggedIn");
+    if (isLoggedIn === "true") {
+      navigation.navigate("profile");
     } else {
-      navigation.navigate('login'); // Ensure Login is registered in your navigator
+      navigation.navigate("login");
     }
   };
-
 
   useEffect(() => {
     const database = getDatabase();
@@ -48,95 +50,133 @@ const UserNewsScratchScreen = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor={Platform.OS === 'android' ? '#009688' : 'white'} barStyle={Platform.OS === 'ios' ? 'dark-content' : 'light-content'} />
-    
+      <StatusBar
+        backgroundColor={Platform.OS === "android" ? "#009688" : "white"}
+        barStyle={Platform.OS === "ios" ? "dark-content" : "light-content"}
+      />
+
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.heading}>Wishlist</Text>
+        <Text style={styles.heading}>Offers</Text>
       </View>
-    
-    <ScrollView style={styles.containered}>
-      {posts.map((post) => (
-        <View key={post.id} style={styles.newsCard}>
-          <Image
-            source={{ uri: post.imageUrl || "https://via.placeholder.com/100" }}
-            style={styles.newsImage}
-          />
-          <View style={styles.textContainer}>
-            <Text style={styles.newsTitle}>{post.title}</Text>
-            <Text style={styles.newsDescription}>{post.description}</Text>
 
-            {/* Custom Scratch Card */}
-            <ScratchCardComponent code={post.code || "NO CODE"} />
-          </View>
-        </View>
-      ))}
-    </ScrollView>
+      <ScrollView style={styles.containered}>
+        {posts.map((post) => (
+          <View key={post.id} style={styles.newsCard}>
+            <Image
+              source={{ uri: post.imageUrl || "https://via.placeholder.com/100" }}
+              style={styles.newsImage}
+            />
+            <View style={styles.textContainer}>
+              <Text style={styles.newsTitle}>{post.title}</Text>
+              <Text style={styles.newsDescription}>{post.description}</Text>
 
-          {/* Bottom Navigation */}
-          <View style={styles.bottomNav}>
-            <NavIcon title="Home" iconSource={require('../assets/home.png')} />
-            <NavIcon title="Offers" iconSource={require('../assets/offer.png')} onPress={() => navigation.navigate('Scratch')}/>
-            <NavIcon title="Favorites" iconSource={require('../assets/heart.png')}  onPress={() => navigation.navigate('wishlist')} />
-            <NavIcon title="Profile" iconSource={require('../assets/profffff.png')} onPress={handleProfileClick} style={styles.naviconextra} />
+              {/* Custom Scratch Card */}
+              <ScratchCardComponent code={post.code || "NO CODE"} postId={post.id} />
+            </View>
           </View>
+        ))}
+      </ScrollView>
+
+      {/* Bottom Navigation */}
+      <View style={styles.bottomNav}>
+        <NavIcon
+          title="Home"
+          iconSource={require("../assets/home.png")}
+          onPress={() => navigation.navigate("Home")}
+        />
+        <NavIcon
+          title="Offers"
+          iconSource={require("../assets/offer.png")}
+          onPress={() => navigation.navigate("Scratch")}
+        />
+        <NavIcon
+          title="Favorites"
+          iconSource={require("../assets/heart.png")}
+          onPress={() => navigation.navigate("wishlist")}
+        />
+        <NavIcon
+          title="Profile"
+          iconSource={require("../assets/profffff.png")}
+          onPress={handleProfileClick}
+          style={styles.naviconextra}
+        />
+      </View>
     </View>
   );
 };
 
-
-
-
-
-const ScratchCardComponent = ({ code }) => {
+const ScratchCardComponent = ({ code, postId }) => {
   const [scratched, setScratched] = useState(false);
   const animationRef = useRef(null);
 
-  const handleScratch = () => {
+  const checkScratchStatus = async () => {
+    const status = await SecureStore.getItemAsync(`scratch_${postId}`);
+    if (status === "scratched") {
+      setScratched(true);
+    }
+  };
+
+  useEffect(() => {
+    checkScratchStatus();
+  }, []);
+
+  const handleScratch = async () => {
     if (!scratched) {
       setScratched(true);
       animationRef.current?.play();
+      await SecureStore.setItemAsync(`scratch_${postId}`, "scratched");
       console.log("Scratch Complete!");
     }
   };
 
+  const handleCopy = async () => {
+    await Clipboard.setStringAsync(code);
+    Alert.alert("Copied!", "Code copied to clipboard.");
+  };
+
   return (
-    <View style={styles.scratchCardContainer}>
-      <Text style={styles.revealText}>{scratched ? code : "Scratch to Reveal"}</Text>
+    <View style={styles.scratchCardWrapper}>
+      <View style={styles.scratchCardContainer}>
+        <Text style={styles.revealText}>{scratched ? code : "Scratch to Reveal"}</Text>
+        <View
+          style={[
+            styles.scratchContent,
+            { backgroundColor: scratched ? "transparent" : "#FFD700" },
+          ]}
+        >
+          {!scratched && (
+            <View
+              style={styles.overlay}
+              onStartShouldSetResponder={() => true}
+              onMoveShouldSetResponder={() => true}
+              onResponderMove={handleScratch}
+            />
+          )}
 
-      {/* Scratch Area */}
-      <View
-        style={[
-          styles.scratchContent,
-          { backgroundColor: scratched ? "transparent" : "#FFD700" },
-        ]}
-      >
-        {!scratched && (
-          <View
-            style={styles.overlay}
-            onStartShouldSetResponder={() => true}
-            onMoveShouldSetResponder={() => true}
-            onResponderMove={handleScratch}
-          />
-        )}
-
-        {/* Lottie Confetti Animation */}
-        {scratched && (
-          <LottieView
-            ref={animationRef}
-            source={require("../assets/sparkles.json")} 
-            autoPlay={false}
-            loop={false}
-            style={styles.lottie}
-          />
-        )}
+          {scratched && (
+            <LottieView
+              ref={animationRef}
+              source={require("../assets/sparkles.json")}
+              autoPlay={false}
+              loop={false}
+              style={styles.lottie}
+            />
+          )}
+        </View>
       </View>
+
+      {scratched && (
+                <TouchableOpacity onPress={handleCopy} style={styles.copyButton}>
+                  <Image source={require('../assets/copyy.png')} style={styles.copyButtonimg} />
+                </TouchableOpacity>
+
+        
+      )}
     </View>
   );
 };
 
-
-// NavIcon Component
 const NavIcon = ({ title, iconSource, onPress }) => (
   <TouchableOpacity style={styles.navItem} onPress={onPress}>
     <Image source={iconSource} style={styles.navIcon} />
@@ -145,10 +185,22 @@ const NavIcon = ({ title, iconSource, onPress }) => (
 );
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff', },
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', paddingHorizontal: 15, paddingVertical: 20, paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 22 : 70 },
-  heading: { fontSize: Platform.OS === 'ios' ? 22 : 18, fontWeight: 'bold', color: '#000000', flex: 1 },
-  containered:{padding: 10, backgroundColor: "#fff",},
+  container: { flex: 1, backgroundColor: "#fff" },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    paddingHorizontal: 15,
+    paddingVertical: 20,
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight + 22 : 70,
+  },
+  heading: {
+    fontSize: Platform.OS === "ios" ? 22 : 18,
+    fontWeight: "bold",
+    color: "#000000",
+    flex: 1,
+  },
+  containered: { padding: 10, backgroundColor: "#fff" },
   newsCard: {
     flexDirection: "row",
     alignItems: "center",
@@ -181,6 +233,11 @@ const styles = StyleSheet.create({
     color: "gray",
     marginBottom: 5,
   },
+  scratchCardWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 10,
+  },
   scratchCardContainer: {
     width: 150,
     height: 50,
@@ -189,7 +246,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#ccc",
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 10,
     position: "relative",
   },
   scratchContent: {
@@ -222,18 +278,33 @@ const styles = StyleSheet.create({
     left: 0,
     zIndex: 5,
   },
-  bottomNav: { flexDirection: 'row', justifyContent: 'space-around', backgroundColor: '#009688', paddingVertical: 10, 
-    borderTopColor: '#ccc',
-    // Shadow for iOS
-    shadowColor: '#000',
+  copyButton: {
+    marginLeft: 10,
+    backgroundColor: '#009688',
+    paddingHorizontal: 5,
+    paddingVertical: 2,
+    borderRadius: 5,
+  },
+  copyButtonimg: {
+  width:10,
+  height:20,
+  
+  },
+  bottomNav: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    backgroundColor: "#009688",
+    paddingVertical: 10,
+    borderTopColor: "#ccc",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.1,
     shadowRadius: 3,
-    // Shadow for Android
-    elevation: 5,},
-  navItem: { alignItems: 'center' },
+    elevation: 5,
+  },
+  navItem: { alignItems: "center" },
   navIcon: { width: 28, height: 28 },
-  navText: { color: '#ffffff', fontSize: 12, marginTop: 5 },
+  navText: { color: "#ffffff", fontSize: 12, marginTop: 5 },
 });
 
 export default UserNewsScratchScreen;

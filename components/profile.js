@@ -14,6 +14,7 @@ const ProfileScreen = ({ navigation }) => {
   const [userData, setUserData] = useState({ firstName: '', lastName: '', email: '' });
   const [loading, setLoading] = useState(true);
   
+  
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -83,11 +84,11 @@ const ProfileScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.row}>
-        <TouchableOpacity style={styles.card}>
+        <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('wishlist')}>
           <Ionicons name="heart" size={25} color="#009688" />
           <Text style={styles.cardText}>Favorites</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.card}>
+        <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('Scratch')}>
           <Ionicons name="ticket" size={24} color="#009688" />
           <Text style={styles.cardText}>Coupons</Text>
         </TouchableOpacity>
@@ -179,7 +180,7 @@ const styles = StyleSheet.create({
   editProfileText: { color: 'white', fontWeight: 'bold', fontSize: 14 },
 
   row: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: Platform.OS === 'ios' ? 17 :13 },
-  card: { flex: 1, backgroundColor: '#fff', borderRadius: 15, padding: 20, alignItems: 'center', marginHorizontal: 5, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 5, elevation: 2 },
+  card: { flex: 1, backgroundColor: '#fff', borderRadius: 15, padding: 20, alignItems: 'center', marginHorizontal: 5, borderWidth: 0.5, borderColor: '#ddd', shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 3, elevation: 2 },
   cardText: { marginTop: 10, fontSize: 16, fontWeight: 'bold', color: 'black' },
 
   settingsContainer: { backgroundColor: '#fff', borderRadius: 15, paddingVertical: Platform.OS === 'ios' ? 7 : 5, paddingHorizontal:  10,  },

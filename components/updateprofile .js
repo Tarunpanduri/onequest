@@ -105,7 +105,7 @@ const ProfileScreen = () => {
     const copyUserIdToClipboard = async () => {
       if (user?.uid) {
         await Clipboard.setStringAsync(user.uid);
-        Alert.alert("Copied", "User ID copied to clipboard!");
+      Alert.alert("Copied!", "Code copied to clipboard.");
       }
     };
 
@@ -120,7 +120,7 @@ const ProfileScreen = () => {
   return (
     <KeyboardAvoidingView 
       behavior={Platform.OS === "ios" ? "padding" : "height"} 
-      style={{ flex: 1 }}
+      style={{ flex: 1 , backgroundColor: '#009688'}}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView contentContainerStyle={styles.scrollView}>
@@ -203,6 +203,7 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flexGrow: 1,
+    backgroundColor: '#fff',
   },
   header: {
     height: 180,
