@@ -16,9 +16,6 @@ import { useNavigation } from '@react-navigation/native';
 import { AntDesign } from "@expo/vector-icons";
 import { getDatabase, ref, get,set } from 'firebase/database';
 import { auth } from "./firebaseConfig"; // Firebase authentication
-
-
-
 const ServiceDetails = ({ route }) => {
   const navigation = useNavigation();
   const { serviceId, designId } = route.params;
@@ -29,10 +26,7 @@ const ServiceDetails = ({ route }) => {
   const [tagline, setTagline] = useState('');
   const userId = auth.currentUser?.uid; // Get logged-in user ID
   const db = getDatabase();
-
   const [isWishlisted, setIsWishlisted] = useState(false);
-
-
   useEffect(() => {
     if (serviceId) {
       fetchServiceDetails();
@@ -105,10 +99,12 @@ const ServiceDetails = ({ route }) => {
         imageUrl: serviceData.imageUrl,
         address: serviceData.address,
         id: serviceId,
+        designId: designId,
       });
       setIsWishlisted(true);
     }
   };
+  console.log("designId:", serviceId); 
 
   if (loading) {
     return <ActivityIndicator size="large" color="#009688" style={styles.loader} />;
@@ -359,12 +355,6 @@ const ServiceDetails = ({ route }) => {
                             <Text style={styles.buttonText}>{buttonName}</Text>
                           </TouchableOpacity>
                         )}
-
-                        
-
-
-
-
                       </ScrollView>
           </View>
         ) : (
@@ -546,14 +536,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 5,
   },
-
-
-
-
-
-
-
-
   productsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -609,11 +591,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
   },
-
-
-
-
-
   ServiceContainer: {
     marginTop: 10,
     flexDirection: 'row',
@@ -649,13 +626,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#333',
   },
-  
-
-
-
-
-
-
   title: { fontSize: 18, fontWeight: 'bold', marginBottom: 8 },
-  
 });
