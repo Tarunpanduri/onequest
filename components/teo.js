@@ -1,19 +1,100 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView ,Platform,StatusBar} from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Platform, StatusBar, Animated } from 'react-native';
 import { auth, db, database as rtdb } from './firebaseConfig';
 import { query, collection, where, getDocs } from 'firebase/firestore';
-import { ref, get } from 'firebase/database'; // Import Realtime Database functions
+import { ref, get } from 'firebase/database';
 
 const Teo = ({ navigation, route }) => {
   const [area, setArea] = useState('Unknown');
   const [city, setCity] = useState('Unknown');
   const [region, setRegion] = useState('Unknown');
-
   const [services10th, setServices10th] = useState([]);
   const [servicesIntermediate, setServicesIntermediate] = useState([]);
   const [servicesGraduation, setServicesGraduation] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const fadeAnim = useState(new Animated.Value(0))[0];
+
+
+  const cardThemes = {
+    '10th': {
+      bgColor: '#FFEBEE', // Light red
+      borderColor: '#EF5350', // Darker red
+      textColor: '#D32F2F'  // Dark red for text
+    },
+    'intermediate': {
+      bgColor: '#E8F5E9', // Light green
+      borderColor: '#66BB6A', // Darker green
+      textColor: '#2E7D32'  // Dark green for text
+    },
+    'graduation': {
+      bgColor: '#E3F2FD', // Light blue
+      borderColor: '#42A5F5', // Darker blue
+      textColor: '#1565C0'  // Dark blue for text
+    }
+  };
+
+  // Skeleton Loading Components
+  const SkeletonItem = ({ width, height, style }) => (
+    <View style={[
+      { 
+        width, 
+        height, 
+        backgroundColor: '#e1e1e1',
+        borderRadius: 4,
+        overflow: 'hidden',
+      },
+      style
+    ]}>
+      <Animated.View 
+        style={{
+          width: '100%',
+          height: '100%',
+          backgroundColor: '#f2f2f2',
+          opacity: fadeAnim
+        }} 
+      />
+    </View>
+  );
+
+  const renderSkeletonCard = () => (
+    <View style={styles.skeletonCard}>
+      <SkeletonItem width={100} height={100} />
+      <View style={styles.skeletonContent}>
+        <SkeletonItem width={'70%'} height={20} style={{marginBottom: 8}} />
+        <SkeletonItem width={'90%'} height={16} style={{marginBottom: 4}} />
+        <SkeletonItem width={'80%'} height={16} style={{marginBottom: 4}} />
+        <SkeletonItem width={'60%'} height={16} />
+      </View>
+    </View>
+  );
+
+  const renderSkeletonSection = () => (
+    <View style={styles.section}>
+      <SkeletonItem width={120} height={24} style={{marginBottom: 15}} />
+      {renderSkeletonCard()}
+    </View>
+  );
+
+  // Add shimmer animation
+  useEffect(() => {
+    const shimmer = Animated.loop(
+      Animated.sequence([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+        Animated.timing(fadeAnim, {
+          toValue: 0.3,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+      ])
+    );
+    shimmer.start();
+    return () => shimmer.stop();
+  }, []);
 
   useEffect(() => {
     const fetchLocationData = async () => {
@@ -168,8 +249,12 @@ const Teo = ({ navigation, route }) => {
         {error && <Text style={styles.errorText}>{error}</Text>}
 
         {loading ? (
-          <Text style={styles.loadingText}>Loading...</Text>
-        ) : (
+          <>
+          {renderSkeletonSection()}
+          {renderSkeletonSection()}
+          {renderSkeletonSection()}
+        </>
+                ) : (
           <>
 
             <View style={styles.section}>
@@ -401,5 +486,26 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 12,
     marginTop: 5,
-  }
+  },
+  // Skeleton styles
+  skeletonCard: {
+    flexDirection: 'row',
+    backgroundColor: '#f9f9f9',
+    borderRadius: 8,
+    overflow: 'hidden',
+    elevation: 2,
+    marginBottom: 15,
+    padding: 10,
+    gap: 10,
+  },
+  skeletonImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 10,
+  },
+  skeletonContent: {
+    flex: 1,
+    padding: 10,
+    gap: 8,
+  },
 });
