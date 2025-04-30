@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView ,Platform,StatusBar} from 'react-native';
-import { auth, db, rtdb } from './firebaseConfig'; // Import rtdb
+import { auth, db, database as rtdb } from './firebaseConfig';
 import { query, collection, where, getDocs } from 'firebase/firestore';
 import { ref, get } from 'firebase/database'; // Import Realtime Database functions
 
@@ -20,36 +20,49 @@ const Teo = ({ navigation, route }) => {
       try {
         console.log('Fetching user location data...');
         const userId = auth.currentUser?.uid;
-    
+  
         if (!userId) {
           console.error('No user is logged in.');
           setError('No user is logged in.');
           return;
         }
-    
+  
         console.log(`User ID: ${userId}`);
-        console.log('Realtime Database instance:', rtdb); // Debug rtdb
-    
-        const userAddressRef = ref(rtdb, `SavedUsers/${userId}/SavedAddress`);
-        console.log('Fetching address document from Realtime Database...');
-        const snapshot = await get(userAddressRef);
-    
+        
+        // Check if rtdb is properly initialized
+        if (!rtdb) {
+          console.error('Realtime Database is not initialized');
+          setError('Database connection error');
+          return;
+        }
+  
+        const userRef = ref(rtdb, `SavedUsers/${userId}`);
+        console.log('Fetching user document from Realtime Database...');
+        const snapshot = await get(userRef);
+  
         if (snapshot.exists()) {
-          const addressData = snapshot.val();
-          console.log('Address data found:', addressData);
-          setArea(addressData.area || 'Unknown');
-          setCity(addressData.city || 'Unknown');
-          setRegion(addressData.region || 'Unknown');
+          const userData = snapshot.val();
+          console.log('User data found:', userData);
+          
+          // Check if SavedAddress exists in the user data
+          if (userData.SavedAddress) {
+            setArea(userData.SavedAddress.area || 'Unknown');
+            setCity(userData.SavedAddress.city || 'Unknown');
+            setRegion(userData.SavedAddress.region || 'Unknown');
+          } else {
+            console.error('No address data found for the user.');
+            setError('No address data found for the user.');
+          }
         } else {
-          console.error('No address data found for the user.');
-          setError('No address data found for the user.');
+          console.error('No user data found.');
+          setError('No user data found.');
         }
       } catch (err) {
         console.error('Error fetching location data:', err);
         setError('Failed to fetch location data.');
       }
     };
-
+  
     fetchLocationData();
   }, []);
 
@@ -158,15 +171,6 @@ const Teo = ({ navigation, route }) => {
           <Text style={styles.loadingText}>Loading...</Text>
         ) : (
           <>
-            {isLocationIssue && (
-              <View style={styles.noDataContainer}>
-                <Text style={styles.noDataHeading}>
-                  Oops!... Location not found. Please enable location services or provide a valid location.
-                </Text>
-                <Image source={require('../assets/ed.png')} style={styles.noDataImage} resizeMode="contain" />
-                <Text style={styles.noDataSubtext}>Ensure location permissions are granted to the app.</Text>
-              </View>
-            )}
 
             <View style={styles.section}>
               <Text style={styles.title}>10th/SSC</Text>
