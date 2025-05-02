@@ -1,10 +1,10 @@
 // app.js
 
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { StatusBar } from 'expo-status-bar';
-
+import React, { useEffect, useState } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import * as SecureStore from 'expo-secure-store';
 // Screens
 import HomeScreen from './components/HomeScreen';
 import PrimePicks from './components/PrimePicks';
@@ -41,15 +41,39 @@ import Scratch from './components/scratch';
 const Stack = createStackNavigator();
 
 const App = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(null); // Check login status
+
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      const isLoggedIn = await SecureStore.getItemAsync('isLoggedIn');
+      if (isLoggedIn === 'true') {
+        setIsLoggedIn(true); // Redirect to home if logged in
+      } else {
+        setIsLoggedIn(false); // Stay on login page
+      }
+    };
+    checkLoginStatus();
+  }, []);
+
+  if (isLoggedIn === null) {
+    return null; // Loading state or splash screen until the login status is checked
+  }
+
   return (
     <NavigationContainer>
       <StatusBar style="light" backgroundColor="#2c9d92" />
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Home" component={HomeScreen} />
+      {isLoggedIn ? (
+          // If logged in, navigate to Home screen
+          <Stack.Screen name="Home" component={HomeScreen} />
+        ) : (
+          // If not logged in, show Login screen
+          <Stack.Screen name="login" component={LoginPage} />
+        )}
+
         <Stack.Screen name="PrimePicks" component={PrimePicks} />
         <Stack.Screen name="education" component={Mained} />
         <Stack.Screen name="News" component={NewsSection} />
-        <Stack.Screen name="login" component={LoginPage} />
         <Stack.Screen name="signup" component={SignUpScreen} />
         <Stack.Screen name="profile" component={ProfilePage} />
         <Stack.Screen name="Customer" component={Customer} /> 

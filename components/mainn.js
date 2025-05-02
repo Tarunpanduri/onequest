@@ -1,21 +1,23 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState ,useRef} from 'react';
 import {
   View,
   Platform,
   Text,
-  Image,
   ScrollView,
   StyleSheet,
   ActivityIndicator,
   StatusBar,
   TouchableOpacity,
   Linking,
-  Alert
+  Alert,
+  Animated
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { AntDesign } from "@expo/vector-icons";
 import { getDatabase, ref, get,set } from 'firebase/database';
 import { auth } from "./firebaseConfig"; // Firebase authentication
+import { Image } from 'expo-image';
+
 const ServiceDetails = ({ route }) => {
   const navigation = useNavigation();
   const { serviceId, designId } = route.params;
@@ -27,6 +29,234 @@ const ServiceDetails = ({ route }) => {
   const userId = auth.currentUser?.uid; // Get logged-in user ID
   const db = getDatabase();
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const fadeAnim = useRef(new Animated.Value(0.4)).current;
+
+
+
+    // Skeleton Loading Components
+    const SkeletonItem = ({ width, height, style }) => (
+      <View style={[
+        { 
+          width, 
+          height, 
+          backgroundColor: '#e1e1e1',
+          borderRadius: 4,
+          overflow: 'hidden',
+        },
+        style
+      ]}>
+        <Animated.View 
+          style={{
+            width: '100%',
+            height: '100%',
+            backgroundColor: '#f2f2f2',
+            opacity: fadeAnim
+          }} 
+        />
+      </View>
+    );
+  
+    // Design 1 Skeleton (Specialists List)
+    const renderDesign1Skeleton = () => (
+      <View style={styles.containerr}>
+        <View style={styles.infoCard}>
+          <SkeletonItem width="100%" height={200} style={{ borderTopLeftRadius: 13, borderTopRightRadius: 13,marginBottom:10 }} />
+          <View style={styles.infoContainer}>
+            <SkeletonItem width="70%" height={24} style={{marginRight:5}} />
+            <SkeletonItem width={24} height={24} style={{marginRight:5}}/>
+          </View>
+          <View style={styles.infoContainer}>
+            <SkeletonItem width="30%" height={16} style={{marginRight:15}} />
+            <SkeletonItem width="60%" height={16} />
+          </View>
+          <View style={styles.infoContainer}>
+            <SkeletonItem width="30%" height={16} style={{marginRight:15}} />
+            <SkeletonItem width="60%" height={16} />
+          </View>
+          <View style={styles.infoContainer}>
+            <SkeletonItem width="30%" height={16} style={{marginRight:15}}/>
+            <SkeletonItem width="60%" height={16} />
+          </View>
+        </View>
+        
+        <SkeletonItem width="80%" height={24} style={{ alignSelf: 'center', marginVertical: 10 }} />
+        
+        {[1, 2, 3].map((_, index) => (
+          <View key={index} style={[styles.specialistCard, { padding: 15 }]}>
+            <View style={styles.specialistContent}>
+              <SkeletonItem width={80} height={80} style={{ borderRadius: 15, marginRight: 15 }} />
+              <View style={styles.specialistTextContainer}>
+                <SkeletonItem width="60%" height={16} style={{ marginBottom: 8 }} />
+                <SkeletonItem width="40%" height={16} />
+              </View>
+            </View>
+            {index < 2 && <View style={styles.separatorLine} />}
+          </View>
+        ))}
+        
+        <SkeletonItem width="90%" height={50} style={{ 
+          alignSelf: 'center', 
+          marginTop: 20,
+          marginBottom: 70,
+          borderRadius: 13 
+        }} />
+      </View>
+    );
+  
+    // Design 2 Skeleton (Products Grid)
+    const renderDesign2Skeleton = () => (
+      <View style={styles.containerr}>
+        <View style={styles.infoCard}>
+          <SkeletonItem width="100%" height={200} style={{ borderTopLeftRadius: 13, borderTopRightRadius: 13,marginBottom:10 }} />
+          <View style={styles.infoContainer}>
+            <SkeletonItem width="70%" height={24} style={{marginRight:5}} />
+            <SkeletonItem width={24} height={24} style={{marginRight:5}}/>
+          </View>
+          <View style={styles.infoContainer}>
+            <SkeletonItem width="30%" height={16} style={{marginRight:15}} />
+            <SkeletonItem width="60%" height={16} />
+          </View>
+          <View style={styles.infoContainer}>
+            <SkeletonItem width="30%" height={16} style={{marginRight:15}} />
+            <SkeletonItem width="60%" height={16} />
+          </View>
+          <View style={styles.infoContainer}>
+            <SkeletonItem width="30%" height={16} style={{marginRight:15}}/>
+            <SkeletonItem width="60%" height={16} />
+          </View>
+        </View>
+        
+        <SkeletonItem width="80%" height={24} style={{ alignSelf: 'center', marginVertical: 10 }} />
+        
+        <View style={styles.productsGrid}>
+          {[1, 2, 3, 4].map((_, index) => (
+            <View key={index} style={styles.productCard}>
+              <SkeletonItem width={100} height={100} style={{ borderRadius: 10 }} />
+              <SkeletonItem width="80%" height={16} style={{ marginTop: 8 }} />
+              <SkeletonItem width="40%" height={14} style={{ marginTop: 4 }} />
+              <SkeletonItem width="90%" height={30} style={{ 
+                marginTop: 8,
+                borderRadius: 8 
+              }} />
+            </View>
+          ))}
+        </View>
+      </View>
+    );
+  
+    // Design 3 Skeleton (Products List)
+    const renderDesign3Skeleton = () => (
+      <View style={styles.containerr}>
+        <View style={styles.infoCard}>
+          <SkeletonItem width="100%" height={200} style={{ borderTopLeftRadius: 13, borderTopRightRadius: 13,marginBottom:10 }} />
+          <View style={styles.infoContainer}>
+            <SkeletonItem width="70%" height={24} style={{marginRight:5}} />
+            <SkeletonItem width={24} height={24} style={{marginRight:5}}/>
+          </View>
+          <View style={styles.infoContainer}>
+            <SkeletonItem width="30%" height={16} style={{marginRight:15}} />
+            <SkeletonItem width="60%" height={16} />
+          </View>
+          <View style={styles.infoContainer}>
+            <SkeletonItem width="30%" height={16} style={{marginRight:15}} />
+            <SkeletonItem width="60%" height={16} />
+          </View>
+          <View style={styles.infoContainer}>
+            <SkeletonItem width="30%" height={16} style={{marginRight:15}}/>
+            <SkeletonItem width="60%" height={16} />
+          </View>
+        </View>
+        
+        <SkeletonItem width="80%" height={24} style={{ alignSelf: 'center', marginVertical: 10 }} />
+        
+        {[1, 2, 3].map((_, index) => (
+          <View key={index} style={[styles.specialistCard, { padding: 15 }]}>
+            <View style={styles.specialistContent}>
+              <SkeletonItem width={80} height={80} style={{ borderRadius: 15, marginRight: 15 }} />
+              <View style={styles.specialistTextContainer}>
+                <SkeletonItem width="60%" height={16} style={{ marginBottom: 8 }} />
+                <SkeletonItem width="40%" height={16} />
+              </View>
+            </View>
+            {index < 2 && <View style={styles.separatorLine} />}
+          </View>
+        ))}
+        
+        <SkeletonItem width="90%" height={50} style={{ 
+          alignSelf: 'center', 
+          marginTop: 20,
+          marginBottom: 70,
+          borderRadius: 13 
+        }} />
+      </View>
+    );
+  
+    // Design 4 Skeleton (Experts Grid)
+    const renderDesign4Skeleton = () => (
+      <View style={styles.containerr}>
+        <View style={styles.infoCard}>
+          <SkeletonItem width="100%" height={200} style={{ borderTopLeftRadius: 13, borderTopRightRadius: 13,marginBottom:10 }} />
+          <View style={styles.infoContainer}>
+            <SkeletonItem width="70%" height={24} style={{marginRight:5}} />
+            <SkeletonItem width={24} height={24} style={{marginRight:5}}/>
+          </View>
+          <View style={styles.infoContainer}>
+            <SkeletonItem width="30%" height={16} style={{marginRight:15}} />
+            <SkeletonItem width="60%" height={16} />
+          </View>
+          <View style={styles.infoContainer}>
+            <SkeletonItem width="30%" height={16} style={{marginRight:15}} />
+            <SkeletonItem width="60%" height={16} />
+          </View>
+          <View style={styles.infoContainer}>
+            <SkeletonItem width="30%" height={16} style={{marginRight:15}}/>
+            <SkeletonItem width="60%" height={16} />
+          </View>
+        </View>
+        
+        <SkeletonItem width="80%" height={24} style={{ alignSelf: 'center', marginVertical: 10 }} />
+        
+        <View style={styles.ServiceContainer}>
+          {[1, 2, 3, 4].map((_, index) => (
+            <View key={index} style={styles.ServiceRow}>
+              <View style={styles.column}>
+                <SkeletonItem width={120} height={120} style={{ borderRadius: 10 }} />
+                <SkeletonItem width="80%" height={16} style={{ marginTop: 5 }} />
+              </View>
+            </View>
+          ))}
+        </View>
+        
+        <SkeletonItem width="90%" height={50} style={{ 
+          alignSelf: 'center', 
+          marginTop: 20,
+          marginBottom: 70,
+          borderRadius: 13 
+        }} />
+      </View>
+    );
+  
+    // Shimmer animation
+    useEffect(() => {
+      const shimmer = Animated.loop(
+        Animated.sequence([
+          Animated.timing(fadeAnim, {
+            toValue: 1,
+            duration: 800,
+            useNativeDriver: true,
+          }),
+          Animated.timing(fadeAnim, {
+            toValue: 0.4,
+            duration: 800,
+            useNativeDriver: true,
+          }),
+        ])
+      );
+      shimmer.start();
+      return () => shimmer.stop();
+    }, [fadeAnim]);
+
+
   useEffect(() => {
     if (serviceId) {
       fetchServiceDetails();
@@ -108,9 +338,36 @@ const ServiceDetails = ({ route }) => {
   console.log("designId:", serviceId); 
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#009688" style={styles.loader} />;
+    return (
+      <View style={styles.containerred}>
+        {/* Header Skeleton */}
+        <View style={styles.header}>
+          <SkeletonItem width={30} height={30} />
+          <SkeletonItem width="60%" height={24} style={{ marginLeft: 20 }} />
+          <View style={{ width: 30 }} />
+        </View>
+  
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          {designId === 'design1' && renderDesign1Skeleton()}
+          {designId === 'design2' && renderDesign2Skeleton()}
+          {designId === 'design3' && renderDesign3Skeleton()}
+          {designId === 'design4' && renderDesign4Skeleton()}
+        </ScrollView>
+  
+        {/* Bottom Nav Skeleton */}
+        <View style={styles.bottomNav}>
+          {[1, 2, 3, 4].map((_, index) => (
+            <View key={index} style={styles.navItem}>
+              <SkeletonItem width={24} height={24} />
+              <SkeletonItem width={40} height={12} style={{ marginTop: 5 }} />
+            </View>
+          ))}
+        </View>
+      </View>
+    );
   }
 
+  
   if (!serviceData) {
     return <Text style={styles.noData}>Service details not found.</Text>;
   }
@@ -133,7 +390,7 @@ const ServiceDetails = ({ route }) => {
             {/* Image and Info Container */}
                     <ScrollView contentContainerStyle={styles.containerr}>
                       <View style={styles.infoCard}>
-                        <Image source={{ uri: serviceData.imageUrl }} style={styles.image} />
+                        <Image source={{ uri: serviceData.imageUrl }} style={styles.image} cachePolicy="disk" priority="high" />
                         <View style={styles.infoContainer}>
                           <Text style={[styles.infoTextt, styles.boldText]}>{serviceData.name}</Text>
                           <TouchableOpacity onPress={handleWishlistToggle}>
@@ -163,7 +420,7 @@ const ServiceDetails = ({ route }) => {
                           serviceData.specialists.map((specialist, index) => (
                             <View key={index} style={styles.specialistCard}>
                               <View style={styles.specialistContent}>
-                                <Image source={{ uri: specialist.imageUrl || serviceData.imageUrl }} style={styles.specialistImage} />
+                                <Image source={{ uri: specialist.imageUrl || serviceData.imageUrl }} style={styles.specialistImage} cachePolicy="disk" priority="high" />
                                 <View style={styles.specialistTextContainer}>
                                   <Text style={styles.specialistText}>
                                     <Text style={styles.specialistLabel}>Name:</Text> {specialist.name || 'N/A'}
@@ -194,7 +451,7 @@ const ServiceDetails = ({ route }) => {
                         {/* Image and Info Container */}
                         <ScrollView contentContainerStyle={styles.containerr}>
                           <View style={styles.infoCard}>
-                            <Image source={{ uri: serviceData.imageUrl }} style={styles.image} />
+                            <Image source={{ uri: serviceData.imageUrl }} style={styles.image} cachePolicy="disk" priority="high" />
                             <View style={styles.infoContainer}>
                               <Text style={[styles.infoTextt, styles.boldText]}>{serviceData.name}</Text>
                               <TouchableOpacity onPress={handleWishlistToggle}>
@@ -223,7 +480,7 @@ const ServiceDetails = ({ route }) => {
                             {serviceData?.products?.map((product, index) => (
                               <View key={index} style={styles.productCard}>
                                 {/* Product Image */}
-                                <Image source={{ uri: product.imageUrl }} style={styles.productImage} />
+                                <Image source={{ uri: product.imageUrl }} style={styles.productImage} cachePolicy="disk" priority="high" />
             
                                 {/* Mobile Name */}
                                 <Text style={styles.productName}>{product.name}</Text>
@@ -233,7 +490,7 @@ const ServiceDetails = ({ route }) => {
             
                                 {/* Buy Now Button */}
                                 <View style={styles.buttonContainer}>
-                                  <TouchableOpacity style={styles.buyButton} onPress={() => handleBuyNow(product)}>
+                                  <TouchableOpacity style={styles.buyButton} onPress={handleButtonPress}>
                                     <Text style={styles.buyButtonText}>Buy Now</Text>
                                   </TouchableOpacity>
                                 </View>
@@ -249,7 +506,7 @@ const ServiceDetails = ({ route }) => {
            {/* Image and Info Container */}
                        <ScrollView contentContainerStyle={styles.containerr}>
                          <View style={styles.infoCard}>
-                           <Image source={{ uri: serviceData.imageUrl }} style={styles.image} />
+                           <Image source={{ uri: serviceData.imageUrl }} style={styles.image} cachePolicy="disk" priority="high" />
                            <View style={styles.infoContainer}>
                              <Text style={[styles.infoTextt, styles.boldText]}>{serviceData.name}</Text>
                              <TouchableOpacity onPress={handleWishlistToggle}>
@@ -279,7 +536,7 @@ const ServiceDetails = ({ route }) => {
                              serviceData.products.map((product, index) => (
                                <View key={index} style={styles.specialistCard}>
                                  <View style={styles.specialistContent}>
-                                   <Image source={{ uri: product.imageUrl || serviceData.imageUrl }} style={styles.specialistImage} />
+                                   <Image source={{ uri: product.imageUrl || serviceData.imageUrl }} style={styles.specialistImage} cachePolicy="disk" priority="high"  />
                                    <View style={styles.specialistTextContainer}>
                                      <Text style={styles.specialistTextM}>{product.name || 'N/A'}</Text>
                                      <Text style={styles.specialistTextS}>{product.specialty || 'General'}</Text>
@@ -306,7 +563,7 @@ const ServiceDetails = ({ route }) => {
             {/* Image and Info Container */}
                       <ScrollView contentContainerStyle={styles.containerr}>
                         <View style={styles.infoCard}>
-                          <Image source={{ uri: serviceData.imageUrl }} style={styles.image} />
+                          <Image source={{ uri: serviceData.imageUrl }} style={styles.image} cachePolicy="disk" priority="high" />
                           <View style={styles.infoContainer}>
                             <Text style={[styles.infoTextt, styles.boldText]}>{serviceData.name}</Text>
                             <TouchableOpacity onPress={handleWishlistToggle}>
@@ -342,7 +599,7 @@ const ServiceDetails = ({ route }) => {
                               key={index}
                             >
                               <View style={styles.column}>
-                                <Image source={{ uri: expert.imageUrl }} style={styles.ServiceImage} />
+                                <Image source={{ uri: expert.imageUrl }} style={styles.ServiceImage} cachePolicy="disk" priority="high" />
                                 <Text style={styles.ServiceName}>{expert.name}</Text>
                               </View>
                             </View>
@@ -376,7 +633,7 @@ const ServiceDetails = ({ route }) => {
 
 const NavIcon = ({ title, iconSource, onPress }) => (
   <TouchableOpacity style={styles.navItem} onPress={onPress}>
-    <Image source={iconSource} style={styles.navIcon} />
+    <Image source={iconSource} style={styles.navIcon} cachePolicy="disk" priority="high" />
     <Text style={styles.navText}>{title}</Text>
   </TouchableOpacity>
 );
@@ -626,6 +883,16 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'center',
     color: '#333',
+  },
+  // ... (keep all your existing styles)
+  skeletonCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 10,
+    marginBottom: 10,
+    marginHorizontal: 15,
+  },
+  skeletonContent: {
+    flex: 1,
   },
   title: { fontSize: 18, fontWeight: 'bold', marginBottom: 8 },
 });

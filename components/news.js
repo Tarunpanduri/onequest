@@ -1,25 +1,28 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   View,
   Text,
-  Image,
   StyleSheet,
   FlatList,
   ActivityIndicator,
   TouchableOpacity,
   StatusBar,
   Platform,
+  Animated,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { Image } from 'expo-image';
+
 
 const NewsSection = () => {
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigation = useNavigation();
+  const fadeAnim = useRef(new Animated.Value(0.3)).current;
 
   const fetchNews = async () => {
-    const apiUrl = "https://mocki.io/v1/dea4180b-8530-4932-9427-fd71227ea027";
+    const apiUrl = "https://mocki.io/v1/16847e41-f08a-468c-a717-609dc7438d61";
     try {
       setLoading(true);
       const response = await fetch(apiUrl);
@@ -31,8 +34,11 @@ const NewsSection = () => {
         id: item.id || index,
       }));
 
-      setNews(formattedData);
-      setLoading(false);
+      // Simulate network delay to see skeleton loading
+      setTimeout(() => {
+        setNews(formattedData);
+        setLoading(false);
+      }, 1500);
     } catch (error) {
       setError("Failed to load news. Please try again.");
       setLoading(false);
@@ -43,9 +49,68 @@ const NewsSection = () => {
     fetchNews();
   }, []);
 
+  // Skeleton Loading Components
+  const SkeletonItem = ({ width, height, style }) => (
+    <View style={[
+      { 
+        width, 
+        height, 
+        backgroundColor: '#e1e1e1',
+        borderRadius: 4,
+        overflow: 'hidden',
+      },
+      style
+    ]}>
+      <Animated.View 
+        style={{
+          width: '100%',
+          height: '100%',
+          backgroundColor: '#f2f2f2',
+          opacity: fadeAnim
+        }} 
+      />
+    </View>
+  );
+
+  const renderSkeletonCard = () => (
+    <View style={styles.skeletonCard}>
+      <SkeletonItem width="100%" height={200} style={{ marginBottom: 15 }} />
+      <SkeletonItem width="80%" height={24} style={{ marginBottom: 10 }} />
+      <SkeletonItem width="60%" height={18} style={{ marginBottom: 8 }} />
+      <SkeletonItem width="40%" height={14} />
+    </View>
+  );
+
+  // Add shimmer animation
+  useEffect(() => {
+    const shimmer = Animated.loop(
+      Animated.sequence([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+        Animated.timing(fadeAnim, {
+          toValue: 0.3,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+      ])
+    );
+    shimmer.start();
+    return () => shimmer.stop();
+  }, [fadeAnim]);
+
   const renderItem = ({ item }) => (
     <View style={styles.newsCard}>
-      <Image source={{ uri: item.image }} style={styles.image} />
+      <Image 
+        source={{ uri: item.image }}
+        style={styles.image}
+        transition={200} // Smooth fade-in duration
+        contentFit="cover"
+        priority="high" // Prioritize loading these images
+        cachePolicy="disk" // Cache images for better performance
+      />
       <View style={styles.newsCardContent}>
         <Text style={styles.headline}>{item.headline}</Text>
         <Text style={styles.area}>{item.area}</Text>
@@ -59,7 +124,6 @@ const NewsSection = () => {
       <StatusBar
         barStyle="light-content"
         backgroundColor="#009688"
-
       />
 
       {/* Header */}
@@ -71,10 +135,15 @@ const NewsSection = () => {
         <View style={styles.emptyView}></View>
       </View>
 
-
       {/* Main Content */}
       {loading ? (
-        <ActivityIndicator size="large" color="#009688" style={styles.loader} />
+        <FlatList
+          data={[1, 2, 3, 4]} // Dummy data for skeleton loading
+          renderItem={renderSkeletonCard}
+          keyExtractor={(item) => item.toString()}
+          contentContainerStyle={styles.newsSection}
+          showsVerticalScrollIndicator={false}
+        />
       ) : error ? (
         <View style={styles.errorContainer}>
           <Text style={styles.error}>{error}</Text>
@@ -104,6 +173,7 @@ const NewsSection = () => {
   );
 };
 
+
 const NavIcon = ({ title, iconSource }) => (
   <TouchableOpacity style={styles.navItem}>
     <Image source={iconSource} style={styles.navIcon} resizeMode="contain" />
@@ -112,7 +182,7 @@ const NavIcon = ({ title, iconSource }) => (
 );
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#ffffff' },
+  container: { flex: 1 },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -125,7 +195,7 @@ const styles = StyleSheet.create({
   backIcon: { width: 30, height: 30, tintColor: '#ffffff' },
   heading: { fontSize: 18, fontWeight: 'bold', color: '#ffffff', flex: 1, paddingLeft: 20 },
   content: { paddingBottom: 80 },
-  newsSection: { paddingHorizontal: 15, paddingBottom: 80 ,marginTop:10},
+  newsSection: { paddingHorizontal: 15, paddingBottom: 80, marginTop: 10 },
   newsCard: {
     backgroundColor: '#fcfcfc',
     borderWidth: 1,
@@ -155,7 +225,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     backgroundColor: '#009688',
     paddingVertical: 10,
-    bottom:0,
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
   },
   navItem: {
     alignItems: 'center',
@@ -163,11 +236,25 @@ const styles = StyleSheet.create({
   navIcon: {
     width: 24,
     height: 24,
+    tintColor: '#ffffff',
   },
   navText: {
     color: '#ffffff',
     fontSize: 12,
     marginTop: 5,
+  },
+  skeletonCard: {
+    backgroundColor: '#fcfcfc',
+    borderWidth: 1,
+    borderColor: '#e1e1e1',
+    borderRadius: 8,
+    overflow: 'hidden',
+    elevation: 4,
+    marginBottom: 15,
+    padding: 15,
+  },
+  skeletonContent: {
+    marginTop: 10,
   },
 });
 

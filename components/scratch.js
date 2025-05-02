@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from "react";
 import {
   View,
   Text,
-  Image,
   ScrollView,
   StyleSheet,
   Dimensions,
@@ -10,7 +9,9 @@ import {
   Platform,
   TouchableOpacity,
   Alert,
+  Animated,
 } from "react-native";
+import { Image } from 'expo-image'; // Using expo-image
 import { getDatabase, ref, onValue, off } from "firebase/database";
 import LottieView from "lottie-react-native";
 import { useNavigation } from "@react-navigation/native";
@@ -19,7 +20,64 @@ import * as Clipboard from "expo-clipboard";
 
 const UserNewsScratchScreen = () => {
   const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
+  const fadeAnim = useRef(new Animated.Value(0.4)).current;
+
+  // Skeleton Loading Components
+  const SkeletonItem = ({ width, height, style }) => (
+    <View style={[
+      { 
+        width, 
+        height, 
+        backgroundColor: '#e1e1e1',
+        borderRadius: 4,
+        overflow: 'hidden',
+      },
+      style
+    ]}>
+      <Animated.View 
+        style={{
+          width: '100%',
+          height: '100%',
+          backgroundColor: '#f2f2f2',
+          opacity: fadeAnim
+        }} 
+      />
+    </View>
+  );
+
+  const SkeletonNewsCard = () => (
+    <View style={styles.newsCard}>
+      <SkeletonItem width={100} height={100} style={{ borderRadius: 10, marginRight: 15 }} />
+      <View style={styles.textContainer}>
+        <SkeletonItem width="80%" height={20} style={{ marginBottom: 10 }} />
+        <SkeletonItem width="90%" height={14} style={{ marginBottom: 8 }} />
+        <SkeletonItem width="60%" height={14} style={{ marginBottom: 8 }} />
+        <SkeletonItem width={150} height={50} style={{ borderRadius: 10, marginTop: 10 }} />
+      </View>
+    </View>
+  );
+
+  // Shimmer animation
+  useEffect(() => {
+    const shimmer = Animated.loop(
+      Animated.sequence([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+        Animated.timing(fadeAnim, {
+          toValue: 0.4,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+      ])
+    );
+    shimmer.start();
+    return () => shimmer.stop();
+  }, [fadeAnim]);
 
   const handleProfileClick = async () => {
     const isLoggedIn = await SecureStore.getItemAsync("isLoggedIn");
@@ -35,14 +93,19 @@ const UserNewsScratchScreen = () => {
     const postsRef = ref(database, "adminPosts");
 
     const unsubscribe = onValue(postsRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        const formattedPosts = Object.keys(data).map((key) => ({
-          id: key,
-          ...data[key],
-        }));
-        setPosts(formattedPosts);
-      }
+      setLoading(true);
+      // Simulate network delay
+      setTimeout(() => {
+        const data = snapshot.val();
+        if (data) {
+          const formattedPosts = Object.keys(data).map((key) => ({
+            id: key,
+            ...data[key],
+          }));
+          setPosts(formattedPosts);
+        }
+        setLoading(false);
+      }, 1500);
     });
 
     return () => off(postsRef);
@@ -61,21 +124,37 @@ const UserNewsScratchScreen = () => {
       </View>
 
       <ScrollView style={styles.containered}>
-        {posts.map((post) => (
-          <View key={post.id} style={styles.newsCard}>
-            <Image
-              source={{ uri: post.imageUrl || "https://via.placeholder.com/100" }}
-              style={styles.newsImage}
-            />
-            <View style={styles.textContainer}>
-              <Text style={styles.newsTitle}>{post.title}</Text>
-              <Text style={styles.newsDescription}>{post.description}</Text>
-
-              {/* Custom Scratch Card */}
-              <ScratchCardComponent code={post.code || "NO CODE"} postId={post.id} />
+        {loading ? (
+          [1, 2, 3].map((_, index) => <SkeletonNewsCard key={index} />)
+        ) : posts.length > 0 ? (
+          posts.map((post) => (
+            <View key={post.id} style={styles.newsCard}>
+              <Image
+                source={{ uri: post.imageUrl || "https://via.placeholder.com/100" }}
+                style={styles.newsImage}
+                // placeholder={require('../assets/placeholder-offer.png')}
+                placeholderContentFit="cover"
+                transition={300}
+                contentFit="cover"
+              />
+              <View style={styles.textContainer}>
+                <Text style={styles.newsTitle}>{post.title}</Text>
+                <Text style={styles.newsDescription}>{post.description}</Text>
+                <ScratchCardComponent code={post.code || "NO CODE"} postId={post.id} />
+              </View>
             </View>
+          ))
+        ) : (
+          <View style={styles.emptyContainer}>
+            <LottieView
+              source={require("../assets/nooffers.json")}
+              autoPlay
+              loop
+              style={styles.emptyjson}
+            />
+            <Text style={styles.emptyText}>No offers available at the moment!!</Text>
           </View>
-        ))}
+        )}
       </ScrollView>
 
       {/* Bottom Navigation */}
@@ -99,7 +178,6 @@ const UserNewsScratchScreen = () => {
           title="Profile"
           iconSource={require("../assets/profffff.png")}
           onPress={handleProfileClick}
-          style={styles.naviconextra}
         />
       </View>
     </View>
@@ -108,16 +186,17 @@ const UserNewsScratchScreen = () => {
 
 const ScratchCardComponent = ({ code, postId }) => {
   const [scratched, setScratched] = useState(false);
+  const [animationPlayed, setAnimationPlayed] = useState(false); // NEW
   const animationRef = useRef(null);
 
-  const checkScratchStatus = async () => {
-    const status = await SecureStore.getItemAsync(`scratch_${postId}`);
-    if (status === "scratched") {
-      setScratched(true);
-    }
-  };
-
   useEffect(() => {
+    const checkScratchStatus = async () => {
+      const status = await SecureStore.getItemAsync(`scratch_${postId}`);
+      if (status === "scratched") {
+        setScratched(true);
+        setAnimationPlayed(true); // Don't show animation if already scratched
+      }
+    };
     checkScratchStatus();
   }, []);
 
@@ -126,7 +205,9 @@ const ScratchCardComponent = ({ code, postId }) => {
       setScratched(true);
       animationRef.current?.play();
       await SecureStore.setItemAsync(`scratch_${postId}`, "scratched");
-      console.log("Scratch Complete!");
+      setTimeout(() => {
+        setAnimationPlayed(true); // Hide animation after it plays
+      }, 1500); // Adjust timing based on animation length
     }
   };
 
@@ -154,28 +235,29 @@ const ScratchCardComponent = ({ code, postId }) => {
             />
           )}
 
-          {scratched && (
+          {/* Only show animation once */}
+          {scratched && !animationPlayed && (
             <LottieView
               ref={animationRef}
               source={require("../assets/sparkles.json")}
               autoPlay={false}
               loop={false}
               style={styles.lottie}
+              onAnimationFinish={() => setAnimationPlayed(true)} // optional safety
             />
           )}
         </View>
       </View>
 
       {scratched && (
-                <TouchableOpacity onPress={handleCopy} style={styles.copyButton}>
-                  <Image source={require('../assets/copyy.png')} style={styles.copyButtonimg} />
-                </TouchableOpacity>
-
-        
+        <TouchableOpacity onPress={handleCopy} style={styles.copyButton}>
+          <Image source={require('../assets/copyy.png')} style={styles.copyButtonimg} />
+        </TouchableOpacity>
       )}
     </View>
   );
 };
+
 
 const NavIcon = ({ title, iconSource, onPress }) => (
   <TouchableOpacity style={styles.navItem} onPress={onPress}>
@@ -247,6 +329,28 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     position: "relative",
+  },
+  emptyContainer: { 
+    width: '100%', 
+    height: 200, 
+    alignSelf: 'center', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    marginTop: 150, 
+    paddingHorizontal: 20 
+  },
+
+  emptyjson: { 
+    width: 150, 
+    height: 150, 
+    marginBottom: 20, 
+  },
+
+  emptyText: { 
+    fontSize: 18, 
+    color: '#333', 
+    fontWeight: 'bold', 
+    textAlign: 'center', 
   },
   scratchContent: {
     justifyContent: "center",

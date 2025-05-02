@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Platform, StatusBar, Animated } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform, StatusBar, Animated } from 'react-native';
 import { auth, db, database as rtdb } from './firebaseConfig';
 import { query, collection, where, getDocs } from 'firebase/firestore';
 import { ref, get } from 'firebase/database';
+import { Image } from 'expo-image'; // Import expo-image
+
 
 const Teo = ({ navigation, route }) => {
   const [area, setArea] = useState('Unknown');
@@ -34,67 +36,70 @@ const Teo = ({ navigation, route }) => {
     }
   };
 
-  // Skeleton Loading Components
-  const SkeletonItem = ({ width, height, style }) => (
-    <View style={[
-      { 
-        width, 
-        height, 
-        backgroundColor: '#e1e1e1',
-        borderRadius: 4,
-        overflow: 'hidden',
-      },
-      style
-    ]}>
-      <Animated.View 
-        style={{
-          width: '100%',
-          height: '100%',
-          backgroundColor: '#f2f2f2',
-          opacity: fadeAnim
-        }} 
-      />
-    </View>
-  );
+// Skeleton Loading Components
+const SkeletonItem = ({ width, height, style }) => (
+  <View style={[
+    { 
+      width, 
+      height, 
+      backgroundColor: '#e1e1e1',
+      borderRadius: 4,
+      overflow: 'hidden',
+    },
+    style
+  ]}>
+    <Animated.View 
+      style={{
+        width: '100%',
+        height: '100%',
+        backgroundColor: '#f2f2f2',
+        opacity: fadeAnim
+      }} 
+    />
+  </View>
+);
 
-  const renderSkeletonCard = () => (
-    <View style={styles.skeletonCard}>
-      <SkeletonItem width={100} height={100} />
-      <View style={styles.skeletonContent}>
-        <SkeletonItem width={'70%'} height={20} style={{marginBottom: 8}} />
-        <SkeletonItem width={'90%'} height={16} style={{marginBottom: 4}} />
-        <SkeletonItem width={'80%'} height={16} style={{marginBottom: 4}} />
-        <SkeletonItem width={'60%'} height={16} />
-      </View>
+const renderSkeletonCard = () => (
+  <View style={styles.skeletonCard}>
+    <SkeletonItem width={100} height={100} style={styles.skeletonImage} />
+    <View style={styles.skeletonContent}>
+      <SkeletonItem width={'80%'} height={20} style={{ marginBottom: 10 }} />
+      <SkeletonItem width={'60%'} height={16} style={{ marginBottom: 8 }} />
+      <SkeletonItem width={'90%'} height={16} style={{ marginBottom: 4 }} />
+      <SkeletonItem width={'70%'} height={16} />
     </View>
-  );
+  </View>
+);
 
-  const renderSkeletonSection = () => (
-    <View style={styles.section}>
-      <SkeletonItem width={120} height={24} style={{marginBottom: 15}} />
-      {renderSkeletonCard()}
-    </View>
-  );
+const renderSkeletonSection = () => (
+  <View style={styles.section}>
+    <SkeletonItem width={120} height={24} style={{ marginBottom: 15 }} />
+    {renderSkeletonCard()}
+    {renderSkeletonCard()}
+  </View>
+);
 
-  // Add shimmer animation
-  useEffect(() => {
-    const shimmer = Animated.loop(
-      Animated.sequence([
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 800,
-          useNativeDriver: true,
-        }),
-        Animated.timing(fadeAnim, {
-          toValue: 0.3,
-          duration: 800,
-          useNativeDriver: true,
-        }),
-      ])
-    );
-    shimmer.start();
-    return () => shimmer.stop();
-  }, []);
+// Shimmer animation
+useEffect(() => {
+  const shimmer = Animated.loop(
+    Animated.sequence([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.timing(fadeAnim, {
+        toValue: 0.4,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+    ])
+  );
+  shimmer.start();
+  return () => shimmer.stop();
+}, [fadeAnim]);
+
+
 
   useEffect(() => {
     const fetchLocationData = async () => {
@@ -239,7 +244,9 @@ const Teo = ({ navigation, route }) => {
           accessible={true}
           accessibilityLabel="Go Back"
         >
-          <Image source={require('../assets/back.png')} style={styles.backIcon} />
+          <Image source={require('../assets/back.png')} style={styles.backIcon}                      transition={300}
+                      contentFit="cover"
+                      cachePolicy="disk" priority="high"  />
         </TouchableOpacity>
         <Text style={styles.heading}>TOP ORGANIZATIONS</Text>
         <View style={styles.emptyView}></View>
@@ -262,7 +269,9 @@ const Teo = ({ navigation, route }) => {
               {services10th.length > 0 ? (
                 services10th.map((service) => (
                   <View key={service.id} style={styles.card}>
-                    <Image source={{ uri: service.imageUrl }} style={styles.image} />
+                    <Image source={{ uri: service.imageUrl }} style={styles.image}                       transition={300}
+                      contentFit="cover"
+                      cachePolicy="disk" priority="high" />
                     <View style={styles.cardContent}>
                       <Text style={styles.cardTitle}>{service.name}</Text>
                       <Text style={styles.cardText}>Courses Offered:</Text>
@@ -285,7 +294,9 @@ const Teo = ({ navigation, route }) => {
               {servicesIntermediate.length > 0 ? (
                 servicesIntermediate.map((service) => (
                   <View key={service.id} style={styles.card}>
-                    <Image source={{ uri: service.imageUrl }} style={styles.image} />
+                    <Image source={{ uri: service.imageUrl }} style={styles.image}                       transition={300}
+                      contentFit="cover"
+                      cachePolicy="disk" priority="high"  />
                     <View style={styles.cardContent}>
                       <Text style={styles.cardTitle}>{service.name}</Text>
                       <Text style={styles.cardText}>Courses Offered:</Text>
@@ -308,7 +319,11 @@ const Teo = ({ navigation, route }) => {
               {servicesGraduation.length > 0 ? (
                 servicesGraduation.map((service) => (
                   <View key={service.id} style={styles.card}>
-                    <Image source={{ uri: service.imageUrl }} style={styles.image} />
+                    <Image source={{ uri: service.imageUrl }} style={styles.image}                       transition={300}
+                      contentFit="cover"
+                      cachePolicy="disk"
+                      priority="high" 
+                      />
                     <View style={styles.cardContent}>
                       <Text style={styles.cardTitle}>{service.name}</Text>
                       <Text style={styles.cardText}>Courses Offered:</Text>

@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from 'react';
 import {
   View,
   Text,
-  Image,
   StyleSheet,
   StatusBar,
   TouchableOpacity,
@@ -12,32 +11,90 @@ import {
   Platform,
   Animated,
 } from 'react-native';
+import { Image } from 'expo-image'; // Import expo-image
 import { useNavigation } from '@react-navigation/native';
-import { db } from './firebaseConfig'; // Import Firestore from config file
-import { collection, getDocs } from 'firebase/firestore'; // Firestore queries
+import { db } from './firebaseConfig';
+import { collection, getDocs } from 'firebase/firestore';
 
-// Job Card Component
+// Skeleton Loading Components
+const SkeletonItem = ({ width, height, style }) => {
+  const fadeAnim = useRef(new Animated.Value(0.4)).current;
+
+  useEffect(() => {
+    const shimmer = Animated.loop(
+      Animated.sequence([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+        Animated.timing(fadeAnim, {
+          toValue: 0.4,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+      ])
+    );
+    shimmer.start();
+    return () => shimmer.stop();
+  }, [fadeAnim]);
+
+  return (
+    <View style={[
+      { 
+        width, 
+        height, 
+        backgroundColor: '#e1e1e1',
+        borderRadius: 4,
+        overflow: 'hidden',
+      },
+      style
+    ]}>
+      <Animated.View 
+        style={{
+          width: '100%',
+          height: '100%',
+          backgroundColor: '#f2f2f2',
+          opacity: fadeAnim
+        }} 
+      />
+    </View>
+  );
+};
+
+const SkeletonJobCard = () => (
+  <View style={styles.cardContainer}>
+    <SkeletonItem width={80} height={80} style={{ borderRadius: 10 }} />
+    <View style={[styles.textContainer, { flex: 1 }]}>
+      <SkeletonItem width="80%" height={16} style={{ marginBottom: 8 }} />
+      <SkeletonItem width="60%" height={16} style={{ marginBottom: 16 }} />
+      <SkeletonItem width="40%" height={30} style={{ borderRadius: 5, marginBottom: 8 }} />
+      <SkeletonItem width="70%" height={14} />
+    </View>
+  </View>
+);
+
+// Job Card Component with expo-image
 const JobCard = ({ logo, company, position, applyLink, lastDate }) => {
-  const fadeAnimation = useRef(new Animated.Value(1)).current; // Initial opacity is 1
+  const fadeAnimation = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     const startFade = () => {
       Animated.sequence([
         Animated.timing(fadeAnimation, {
-          toValue: 0, // Fade out to 0 opacity
-          duration: 1000, // 1 second
+          toValue: 0,
+          duration: 1000,
           useNativeDriver: true,
         }),
         Animated.timing(fadeAnimation, {
-          toValue: 1, // Fade in to full opacity
-          duration: 1000, // 1 second
+          toValue: 1,
+          duration: 1000,
           useNativeDriver: true,
         }),
       ]).start();
     };
 
-    const interval = setInterval(startFade, 3000); // Fade every 3 seconds
-
+    const interval = setInterval(startFade, 3000);
     return () => clearInterval(interval);
   }, [fadeAnimation]);
 
@@ -46,6 +103,9 @@ const JobCard = ({ logo, company, position, applyLink, lastDate }) => {
       <Image
         source={{ uri: logo || 'https://via.placeholder.com/80' }}
         style={styles.logoLeft}
+        placeholderContentFit="contain"
+        transition={300}
+        contentFit="contain"
       />
       <View style={styles.textContainer}>
         <Text style={styles.text}>{`${company} IS HIRING: ${position} - FRESHERS`}</Text>
@@ -53,16 +113,10 @@ const JobCard = ({ logo, company, position, applyLink, lastDate }) => {
           style={styles.applyButton}
           onPress={() => applyLink && Linking.openURL(applyLink)}
           disabled={!applyLink}
-          accessibilityLabel={`Apply for ${position} at ${company}`}
         >
           <Text style={styles.buttonText}>Apply Now</Text>
         </TouchableOpacity>
-        <Animated.Text
-          style={[
-            styles.lastDateText,
-            { opacity: fadeAnimation }, // Apply fade animation
-          ]}
-        >
+        <Animated.Text style={[styles.lastDateText, { opacity: fadeAnimation }]}>
           <Text style={styles.lastDateLabel}>Last Date to Apply: </Text>
           <Text style={styles.lastDateValue}>{lastDate}</Text>
         </Animated.Text>
@@ -79,6 +133,10 @@ const PrimePicks = () => {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
+        setLoading(true);
+        // Simulate network delay to see skeleton loading
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
         const querySnapshot = await getDocs(collection(db, 'jobs'));
         const jobs = querySnapshot.docs.map((doc) => ({
           id: doc.id,
@@ -101,11 +159,12 @@ const PrimePicks = () => {
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Image source={require('../assets/back.png')} style={styles.backIcon} />
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Image 
+            source={require('../assets/back.png')} 
+            style={styles.backIcon} 
+            contentFit="contain"
+          />
         </TouchableOpacity>
         <Text style={styles.heading}>JOB NOTIFICATIONS</Text>
         <View style={styles.emptyView}></View>
@@ -113,7 +172,12 @@ const PrimePicks = () => {
 
       {/* Job Listings */}
       {loading ? (
-        <ActivityIndicator size="large" color="#009688" style={{ marginTop: 50 }} />
+        <FlatList
+          contentContainerStyle={{ paddingBottom: 70, paddingTop: 20 }}
+          data={[1, 2, 3, 4,5,6,7]} // Dummy data for skeleton loading
+          renderItem={() => <SkeletonJobCard />}
+          keyExtractor={(item) => item.toString()}
+        />
       ) : jobData.length > 0 ? (
         <FlatList
           contentContainerStyle={{ paddingBottom: 70, paddingTop: 20 }}
@@ -162,15 +226,20 @@ const PrimePicks = () => {
   );
 };
 
-// NavIcon Component
+// NavIcon Component with expo-image
 const NavIcon = ({ title, iconSource, onPress }) => (
   <TouchableOpacity style={styles.navItem} onPress={onPress}>
-    <Image source={iconSource} style={styles.navIcon} />
+    <Image 
+      source={iconSource} 
+      style={styles.navIcon} 
+      contentFit="contain"
+    />
     <Text style={styles.navText}>{title}</Text>
   </TouchableOpacity>
 );
 
 export default PrimePicks;
+
 
 const styles = StyleSheet.create({
   header: {

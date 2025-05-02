@@ -1,10 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import { View, Platform, Text, Image, StyleSheet, ScrollView, StatusBar,Button, ActivityIndicator, TouchableOpacity, RefreshControl } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import {
+  View,
+  Platform,
+  Text,
+  StyleSheet,
+  ScrollView,
+  StatusBar,
+  ActivityIndicator,
+  TouchableOpacity,
+  RefreshControl,
+  Animated
+} from 'react-native';
+import { Image } from 'expo-image';
 import { useNavigation } from '@react-navigation/native';
 import { collection, query, where, getDocs, limit } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { getDatabase, ref, get } from 'firebase/database';
-import { db } from './firebaseConfig'; // Import the shared Firebase instance
+import { db } from './firebaseConfig';
 import LottieView from 'lottie-react-native';
 
 const PrimePicks = () => {
@@ -13,16 +25,69 @@ const PrimePicks = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [location, setLocation] = useState({ area: 'Unknown', city: 'Unknown', region: 'Unknown' });
-
-  const largeCities = ['Hyderabad', 'Bangalore', 'Mumbai']; // Example list of large cities
+  const fadeAnim = useRef(new Animated.Value(0.4)).current;
+  const largeCities = ['Hyderabad', 'Bangalore', 'Mumbai'];
   const [showEmptyContainer, setShowEmptyContainer] = useState(false);
+
+  // Skeleton Loading Components
+  const SkeletonItem = ({ width, height, style }) => (
+    <View style={[
+      { 
+        width, 
+        height, 
+        backgroundColor: '#e1e1e1',
+        borderRadius: 4,
+        overflow: 'hidden',
+      },
+      style
+    ]}>
+      <Animated.View 
+        style={{
+          width: '100%',
+          height: '100%',
+          backgroundColor: '#f2f2f2',
+          opacity: fadeAnim
+        }} 
+      />
+    </View>
+  );
+
+  const renderSkeletonCard = () => (
+    <View style={styles.skeletonCard}>
+      <SkeletonItem width={60} height={60} style={{ borderRadius: 10, marginRight: 15 }} />
+      <View style={styles.skeletonContent}>
+        <SkeletonItem width={'70%'} height={20} style={{ marginBottom: 8 }} />
+        <SkeletonItem width={'50%'} height={16} />
+      </View>
+    </View>
+  );
+
+  // Shimmer animation
+  useEffect(() => {
+    const shimmer = Animated.loop(
+      Animated.sequence([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+        Animated.timing(fadeAnim, {
+          toValue: 0.4,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+      ])
+    );
+    shimmer.start();
+    return () => shimmer.stop();
+  }, [fadeAnim]);
 
   useEffect(() => {
     if (!loading && services.length === 0) {
       const timer = setTimeout(() => setShowEmptyContainer(true), 1000); 
-      return () => clearTimeout(timer); // Cleanup on unmount
+      return () => clearTimeout(timer);
     } else {
-      setShowEmptyContainer(false); // Reset visibility state
+      setShowEmptyContainer(false);
     }
   }, [loading, services]);
  
@@ -44,9 +109,8 @@ const PrimePicks = () => {
         if (snapshot.exists()) {
           const locationData = snapshot.val();
           const { area, city, region } = locationData || {};
-          console.log('Fetched location data:', { area, city, region });
           setLocation({ area, city, region });
-          fetchServices(area, city); // Pass both area and city
+          fetchServices(area, city);
         } else {
           console.warn('No location data found.');
         }
@@ -60,11 +124,6 @@ const PrimePicks = () => {
     fetchLocationData();
   }, []);
 
-
-
-
-
-
   const isLargeCity = (city) => largeCities.includes(city);
 
   const fetchServices = async (area, city) => {
@@ -74,13 +133,10 @@ const PrimePicks = () => {
       setLoading(true);
 
       let queryCondition;
-
       if (isLargeCity(city)) {
         queryCondition = where('area', '==', area);
-        console.log("Fetching services for large city by area:", area);
       } else {
         queryCondition = where('city', '==', city);
-        console.log("Fetching services for small city by city:", city);
       }
 
       const q = query(collection(db, 'services'), queryCondition, limit(10));
@@ -93,7 +149,7 @@ const PrimePicks = () => {
           id: doc.id,
           imageUrl: data.imageUrl || '',
           name: data.name || 'Unknown Service',
-          designId: data.designId || '', // Ensure designId is available
+          designId: data.designId || '',
         });
       });
 
@@ -111,17 +167,10 @@ const PrimePicks = () => {
     setRefreshing(false);
   };
 
-  const fallbackImage = 'https://via.placeholder.com/60';
 
   const handleServicePress = (serviceId, designId) => {
     navigation.navigate('maineddded', { serviceId, designId });
   };
-
-  const EmptyState = ({ message }) => (
-    <View style={styles.emptyStateContainer}>
-      <Text style={styles.emptyStateText}>{message}</Text>
-    </View>
-  );
 
   return (
     <View style={{ flex: 1, backgroundColor: '#ffffff' }}>
@@ -139,7 +188,14 @@ const PrimePicks = () => {
       {/* Main Content */}
       <View style={styles.content}>
         {loading ? (
-          <ActivityIndicator size="large" color="#009688" style={styles.loader} />
+          <ScrollView
+            style={styles.scrollContainer}
+            contentContainerStyle={styles.skeletonContainer}
+          >
+            {[1, 2, 3, 4, 5].map((_, index) => (
+              <View key={index}>{renderSkeletonCard()}</View>
+            ))}
+          </ScrollView>
         ) : (
           <>
             {services.length > 0 ? (
@@ -154,8 +210,12 @@ const PrimePicks = () => {
                     onPress={() => handleServicePress(service.id, service.designId)}
                   >
                     <Image
-                      source={{ uri: service.imageUrl || fallbackImage }}
+                      source={{ uri: service.imageUrl }}
                       style={styles.cardImage}
+                      transition={300}
+                      contentFit="cover"
+                      cachePolicy="disk"
+                      priority="high" 
                     />
                     <View>
                       <Text style={styles.cardTitle}>{service.name}</Text>
@@ -194,15 +254,12 @@ const PrimePicks = () => {
   );
 };
 
-// NavIcon component
 const NavIcon = ({ title, iconSource, onPress }) => (
   <TouchableOpacity style={styles.navItem} onPress={onPress}>
     <Image source={iconSource} style={styles.navIcon} />
     <Text style={styles.navText}>{title}</Text>
   </TouchableOpacity>
 );
-
-export default PrimePicks;
 
 const styles = StyleSheet.create({
   header: {
@@ -217,11 +274,13 @@ const styles = StyleSheet.create({
   backIcon: { width: 30, height: 30, tintColor: '#ffffff' },
   heading: { fontSize: 18, fontWeight: 'bold', color: '#ffffff', flex: 1, paddingLeft: 20 },
   emptyView: { width: 30 },
-  loader: { marginTop: 50 },
   content: { flex: 1, paddingBottom: 60 },
   scrollContainer: {
     paddingHorizontal: 15,
     paddingTop: 10,
+  },
+  skeletonContainer: {
+    paddingBottom: 20,
   },
   card: {
     flexDirection: 'row',
@@ -232,14 +291,26 @@ const styles = StyleSheet.create({
     elevation: 3,
     alignItems: 'center',
   },
+  skeletonCard: {
+    flexDirection: 'row',
+    backgroundColor: '#f8f8f8',
+    marginBottom: 10,
+    borderRadius: 10,
+    padding: 10,
+    elevation: 3,
+    alignItems: 'center',
+  },
+  skeletonContent: {
+    flex: 1,
+  },
   cardImage: {
     width: 60,
     height: 60,
     borderRadius: 10,
     marginRight: 15,
+    backgroundColor: '#e1e1e1',
   },
   cardTitle: { fontSize: 16, fontWeight: 'bold' },
-  noData: { textAlign: 'center', fontSize: 16, color: '#666666', marginTop: 50 },
   bottomNav: {
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -273,25 +344,26 @@ const styles = StyleSheet.create({
     height: 150,
     marginBottom: 13,
   },
-  noservicetext:{
-    fontSize:17,
-    marginBottom:10,
-    // marginTop:5,
+  noservicetext: {
+    fontSize: 17,
+    marginBottom: 10,
   },
   noservicebutton: {
-    backgroundColor: '#009688', // Button color
+    backgroundColor: '#009688',
     marginTop: 20,
     marginHorizontal: 70,
     paddingVertical: 10,
-    paddingHorizontal:50,
+    paddingHorizontal: 50,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius:10,
-    marginBottom:20
+    borderRadius: 10,
+    marginBottom: 20
   },
   logoutText: {
     fontWeight: 'bold',
     color: 'white',
-    fontSize:15
+    fontSize: 15
   }
 });
+
+export default PrimePicks;
