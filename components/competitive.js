@@ -1,4 +1,4 @@
-import React from 'react';
+import React ,{useState} from 'react';
 import {
   View,
   Platform,
@@ -10,9 +10,25 @@ import {
   ScrollView,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import * as SecureStore from 'expo-secure-store';
+
 
 const PrimePicks = () => {
   const navigation = useNavigation();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  
+
+
+
+
+        const handleProfileClick = async () => {
+          const isLoggedIn = await SecureStore.getItemAsync('isLoggedIn');
+          if (isLoggedIn === 'true') {
+            navigation.navigate('profile'); // Ensure Profile is registered in your navigator
+          } else {
+            navigation.navigate('login'); // Ensure Login is registered in your navigator
+          }
+        };
 
   return (
     <View style={{ flex: 1, backgroundColor: '#ffffff' }}>
@@ -23,7 +39,7 @@ const PrimePicks = () => {
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Image source={require('../assets/back.png')} style={styles.backIcon} />
         </TouchableOpacity>
-        <Text style={styles.heading}>COMPETITIVE TESTS</Text>
+        <Text style={styles.heading}>Competative Tests</Text>
         <View style={styles.emptyView}></View>
       </View>
 
@@ -98,22 +114,13 @@ const PrimePicks = () => {
         </View>
       </ScrollView>
 
-      {/* Bottom Navigation */}
-      <View style={styles.bottomNav}>
-        {[
-          { title: 'Home', icon: require('../assets/home.png'), screen: 'Home' },
-          { title: 'Notifications', icon: require('../assets/bell.png'), screen: 'Notifications' },
-          { title: 'Offers', icon: require('../assets/offer.png'), screen: 'Offers' },
-          { title: 'Favorites', icon: require('../assets/heart.png'), screen: 'Favorites' },
-        ].map((item, index) => (
-          <NavIcon
-            key={index}
-            title={item.title}
-            iconSource={item.icon}
-            onPress={() => navigation.navigate(item.screen)}
-          />
-        ))}
-      </View>
+    {/* Bottom Navigation */}
+    <View style={styles.bottomNav}>
+      <NavIcon title="Home" iconSource={require('../assets/home.png')} onPress={() => navigation.navigate('Home')}/>
+      <NavIcon title="Offers" iconSource={require('../assets/offer.png')} onPress={() => navigation.navigate('Scratch')}/>
+      <NavIcon title="Favorites" iconSource={require('../assets/heart.png')}  onPress={() => navigation.navigate('wishlist')} />
+      <NavIcon title="Profile" iconSource={require('../assets/profffff.png')} onPress={handleProfileClick} style={styles.naviconextra} />
+    </View>
     </View>
   );
 };
@@ -223,26 +230,18 @@ const styles = StyleSheet.create({
     height: 70,
     resizeMode: 'contain',
   },
-  bottomNav: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    backgroundColor: '#009688',
-    paddingVertical: 10,
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-  },
-  navItem: {
-    alignItems: 'center',
-  },
-  navIcon: {
-    width: 24,
-    height: 24,
-  },
-  navText: {
-    color: '#ffffff',
-    fontSize: 12,
-    marginTop: 5,
-  },
+    bottomNav: { flexDirection: 'row', justifyContent: 'space-around', backgroundColor: '#009688', paddingVertical: 10, 
+      borderTopColor: '#ccc',
+      // Shadow for iOS
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: -2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 3,
+      // Shadow for Android
+      elevation: 5, },
+    navItem: { alignItems: 'center' },
+    naviconextra:{width: 25, height: 25},
+    navIcon: { width: 28, height: 28 },
+    
+    navText: { color: '#ffffff', fontSize: 12, marginTop: 5 },
 });

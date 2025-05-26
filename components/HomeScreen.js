@@ -149,22 +149,15 @@ const HomeScreen = ({ navigation }) => {
 
     {/* Main Scroll View */}
     <ScrollView>
-      {/* Profile Section */}
+
+
       {/* <TouchableOpacity onPress={handleProfileClick}>
-      <Video 
-          source={require('../assets/oq.mp4')}
-          style={styles.cardImageee}
-          useNativeControls
-          resizeMode="cover"
-          isLooping
-          shouldPlay styles={styles.cardImageee}
-        />
+      <Image source={require('../assets/bO.png')} style={styles.cardImageee} />
       </TouchableOpacity> */}
 
       <TouchableOpacity onPress={handleProfileClick}>
-      <Image source={require('../assets/bO.png')} style={styles.cardImageee} />
+        <Image source={require('../assets/bO.png')} style={styles.cardImageeee} />
       </TouchableOpacity>
-
 
       <View style={styles.content}>
         {/* Prime Picks */}
@@ -384,6 +377,9 @@ location: {
   cardContent: { flexDirection: 'row', alignItems: 'center' },
   cardImage: { width: 150, height: 150, borderRadius: 10, marginRight: 15 },
   cardImageee: { width: '100%', height: 150, marginTop:-10 },
+  cardImageeee: { width: '100%', height: 30,  },
+
+
   cardTextContainer: { flex: 1 },
   cardTitle: { fontSize: 20, fontWeight: 'bold', textAlign: 'left', paddingBottom: '10' },
   cardDescription: { fontSize: 12, color: '#666', textAlign: 'left' },

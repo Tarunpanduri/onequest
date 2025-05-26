@@ -17,6 +17,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { getDatabase, ref, get,set } from 'firebase/database';
 import { auth } from "./firebaseConfig"; // Firebase authentication
 import { Image } from 'expo-image';
+import * as SecureStore from 'expo-secure-store';
 
 const ServiceDetails = ({ route }) => {
   const navigation = useNavigation();
@@ -30,7 +31,8 @@ const ServiceDetails = ({ route }) => {
   const db = getDatabase();
   const [isWishlisted, setIsWishlisted] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0.4)).current;
-
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  
 
 
     // Skeleton Loading Components
@@ -303,6 +305,17 @@ const ServiceDetails = ({ route }) => {
         .catch((err) => console.error('An error occurred while opening the link:', err));
     }
   };
+
+        const handleProfileClick = async () => {
+          const isLoggedIn = await SecureStore.getItemAsync('isLoggedIn');
+          if (isLoggedIn === 'true') {
+            navigation.navigate('profile'); // Ensure Profile is registered in your navigator
+          } else {
+            navigation.navigate('login'); // Ensure Login is registered in your navigator
+          }
+        };
+
+
   const checkWishlistStatus = async () => {
     if (!userId) return;
     const wishlistRef = ref(db, `Wishlist/${userId}/${serviceId}`);
@@ -620,13 +633,13 @@ const ServiceDetails = ({ route }) => {
         )}
       </ScrollView>
 
-      {/* Fixed Footer */}
-      <View style={styles.bottomNav}>
-        <NavIcon title="Home" iconSource={require('../assets/home.png')} onPress={() => navigation.navigate('Home')} />
-        <NavIcon title="Notifications" iconSource={require('../assets/bell.png')} onPress={() => navigation.navigate('Notifications')} />
-        <NavIcon title="Offers" iconSource={require('../assets/offer.png')} onPress={() => navigation.navigate('Offers')} />
-        <NavIcon title="Favorites" iconSource={require('../assets/heart.png')} onPress={() => navigation.navigate('Favorites')} />
-      </View>
+    {/* Bottom Navigation */}
+    <View style={styles.bottomNav}>
+      <NavIcon title="Home" iconSource={require('../assets/home.png')} onPress={() => navigation.navigate('Home')}/>
+      <NavIcon title="Offers" iconSource={require('../assets/offer.png')} onPress={() => navigation.navigate('Scratch')}/>
+      <NavIcon title="Favorites" iconSource={require('../assets/heart.png')}  onPress={() => navigation.navigate('wishlist')} />
+      <NavIcon title="Profile" iconSource={require('../assets/profffff.png')} onPress={handleProfileClick} style={styles.naviconextra} />
+    </View>
     </View>
   );
 };
@@ -771,29 +784,20 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  bottomNav: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    backgroundColor: '#009688',
-    paddingVertical: 10,
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-  },
-  navItem: {
-    alignItems: 'center',
-  },
-  navIcon: {
-    width: 24,
-    height: 24,
-  },
-  
-  navText: {
-    color: '#ffffff',
-    fontSize: 12,
-    marginTop: 5,
-  },
+    bottomNav: { flexDirection: 'row', justifyContent: 'space-around', backgroundColor: '#009688', paddingVertical: 10, 
+      borderTopColor: '#ccc',
+      // Shadow for iOS
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: -2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 3,
+      // Shadow for Android
+      elevation: 5, },
+    navItem: { alignItems: 'center' },
+    naviconextra:{width: 25, height: 25},
+    navIcon: { width: 28, height: 28 },
+    
+    navText: { color: '#ffffff', fontSize: 12, marginTop: 5 },
   productsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
