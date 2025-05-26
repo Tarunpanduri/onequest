@@ -12,9 +12,11 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Image } from 'expo-image';
+import * as SecureStore from 'expo-secure-store';
 
 
 const NewsSection = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -119,6 +121,15 @@ const NewsSection = () => {
     </View>
   );
 
+    const handleProfileClick = async () => {
+      const isLoggedIn = await SecureStore.getItemAsync('isLoggedIn');
+      if (isLoggedIn === 'true') {
+        navigation.navigate('profile'); // Ensure Profile is registered in your navigator
+      } else {
+        navigation.navigate('login'); // Ensure Login is registered in your navigator
+      }
+    };
+
   return (
     <View style={styles.container}>
       <StatusBar
@@ -162,20 +173,20 @@ const NewsSection = () => {
         />
       )}
 
-      {/* Bottom Navigation */}
-      <View style={styles.bottomNav}>
-        <NavIcon title="Home" iconSource={require('../assets/home.png')} />
-        <NavIcon title="Notifications" iconSource={require('../assets/bell.png')} />
-        <NavIcon title="Offers" iconSource={require('../assets/offer.png')} />
-        <NavIcon title="Favorites" iconSource={require('../assets/heart.png')} />
-      </View>
+    {/* Bottom Navigation */}
+    <View style={styles.bottomNav}>
+      <NavIcon title="Home" iconSource={require('../assets/home.png')} />
+      <NavIcon title="Offers" iconSource={require('../assets/offer.png')} onPress={() => navigation.navigate('Scratch')}/>
+      <NavIcon title="Favorites" iconSource={require('../assets/heart.png')}  onPress={() => navigation.navigate('wishlist')} />
+      <NavIcon title="Profile" iconSource={require('../assets/profffff.png')} onPress={handleProfileClick} style={styles.naviconextra} />
+    </View>
     </View>
   );
 };
 
 
-const NavIcon = ({ title, iconSource }) => (
-  <TouchableOpacity style={styles.navItem}>
+const NavIcon = ({ title, iconSource, onPress, style }) => (
+  <TouchableOpacity style={[styles.navItem, style]} onPress={onPress}>
     <Image source={iconSource} style={styles.navIcon} resizeMode="contain" />
     <Text style={styles.navText}>{title}</Text>
   </TouchableOpacity>
@@ -220,39 +231,30 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   refreshText: { color: '#ffffff', fontSize: 16, textAlign: 'center' },
-  bottomNav: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    backgroundColor: '#009688',
-    paddingVertical: 10,
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-  },
-  navItem: {
-    alignItems: 'center',
-  },
-  navIcon: {
-    width: 24,
-    height: 24,
-    tintColor: '#ffffff',
-  },
-  navText: {
-    color: '#ffffff',
-    fontSize: 12,
-    marginTop: 5,
-  },
-  skeletonCard: {
-    backgroundColor: '#fcfcfc',
-    borderWidth: 1,
-    borderColor: '#e1e1e1',
-    borderRadius: 8,
-    overflow: 'hidden',
-    elevation: 4,
-    marginBottom: 15,
-    padding: 15,
-  },
+  bottomNav: { flexDirection: 'row', justifyContent: 'space-around', backgroundColor: '#009688', paddingVertical: 10, 
+      borderTopColor: '#ccc',
+      // Shadow for iOS
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: -2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 3,
+      // Shadow for Android
+      elevation: 5, },
+    navItem: { alignItems: 'center' },
+    naviconextra:{width: 25, height: 25},
+    navIcon: { width: 28, height: 28 },
+    
+    navText: { color: '#ffffff', fontSize: 12, marginTop: 5 },
+    skeletonCard: {
+      backgroundColor: '#fcfcfc',
+      borderWidth: 1,
+      borderColor: '#e1e1e1',
+      borderRadius: 8,
+      overflow: 'hidden',
+      elevation: 4,
+      marginBottom: 15,
+      padding: 15,
+    },
   skeletonContent: {
     marginTop: 10,
   },

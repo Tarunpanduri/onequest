@@ -18,6 +18,8 @@ import { getAuth } from 'firebase/auth';
 import { getDatabase, ref, get } from 'firebase/database';
 import { db } from './firebaseConfig';
 import LottieView from 'lottie-react-native';
+import * as SecureStore from 'expo-secure-store';
+
 
 const PrimePicks = () => {
   const navigation = useNavigation();
@@ -28,6 +30,8 @@ const PrimePicks = () => {
   const fadeAnim = useRef(new Animated.Value(0.4)).current;
   const largeCities = ['Hyderabad', 'Bangalore', 'Mumbai'];
   const [showEmptyContainer, setShowEmptyContainer] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  
 
   // Skeleton Loading Components
   const SkeletonItem = ({ width, height, style }) => (
@@ -172,6 +176,15 @@ const PrimePicks = () => {
     navigation.navigate('maineddded', { serviceId, designId });
   };
 
+      const handleProfileClick = async () => {
+        const isLoggedIn = await SecureStore.getItemAsync('isLoggedIn');
+        if (isLoggedIn === 'true') {
+          navigation.navigate('profile'); // Ensure Profile is registered in your navigator
+        } else {
+          navigation.navigate('login'); // Ensure Login is registered in your navigator
+        }
+      };
+
   return (
     <View style={{ flex: 1, backgroundColor: '#ffffff' }}>
       <StatusBar barStyle="light-content" backgroundColor="#009688" translucent={true} />
@@ -243,13 +256,13 @@ const PrimePicks = () => {
         )}
       </View>
 
-      {/* Bottom Navigation */}
-      <View style={styles.bottomNav}>
-        <NavIcon title="Home" iconSource={require('../assets/home.png')} onPress={() => navigation.navigate('Home')} />
-        <NavIcon title="Notifications" iconSource={require('../assets/bell.png')} onPress={() => navigation.navigate('Notifications')} />
-        <NavIcon title="Offers" iconSource={require('../assets/offer.png')} onPress={() => navigation.navigate('Offers')} />
-        <NavIcon title="Favorites" iconSource={require('../assets/heart.png')} onPress={() => navigation.navigate('Favorites')} />
-      </View>
+    {/* Bottom Navigation */}
+    <View style={styles.bottomNav}>
+      <NavIcon title="Home" iconSource={require('../assets/home.png')} />
+      <NavIcon title="Offers" iconSource={require('../assets/offer.png')} onPress={() => navigation.navigate('Scratch')}/>
+      <NavIcon title="Favorites" iconSource={require('../assets/heart.png')}  onPress={() => navigation.navigate('wishlist')} />
+      <NavIcon title="Profile" iconSource={require('../assets/profffff.png')} onPress={handleProfileClick} style={styles.naviconextra} />
+    </View>
     </View>
   );
 };
@@ -311,28 +324,30 @@ const styles = StyleSheet.create({
     backgroundColor: '#e1e1e1',
   },
   cardTitle: { fontSize: 16, fontWeight: 'bold' },
-  bottomNav: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    backgroundColor: '#009688',
-    paddingVertical: 10,
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-  },
-  navItem: {
-    alignItems: 'center',
-  },
-  navIcon: {
-    width: 24,
-    height: 24,
-  },
-  navText: {
-    color: '#ffffff',
-    fontSize: 12,
-    marginTop: 5,
-  },
+  bottomNav: { flexDirection: 'row', justifyContent: 'space-around', backgroundColor: '#009688', paddingVertical: 10, 
+      borderTopColor: '#ccc',
+      // Shadow for iOS
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: -2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 3,
+      // Shadow for Android
+      elevation: 5, },
+    navItem: { alignItems: 'center' },
+    naviconextra:{width: 25, height: 25},
+    navIcon: { width: 28, height: 28 },
+    
+    navText: { color: '#ffffff', fontSize: 12, marginTop: 5 },
+    skeletonCard: {
+      backgroundColor: '#fcfcfc',
+      borderWidth: 1,
+      borderColor: '#e1e1e1',
+      borderRadius: 8,
+      overflow: 'hidden',
+      elevation: 4,
+      marginBottom: 15,
+      padding: 15,
+    },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
